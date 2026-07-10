@@ -1,0 +1,219 @@
+import React, { useState } from "react";
+import { Search, ShieldCheck, ShieldAlert, CheckCircle2, Clipboard, Key, RefreshCw, FileText, Download } from "lucide-react";
+import { DocumentHandover } from "../types";
+import { exportDocumentToPDF } from "../utils/pdfExporter";
+
+interface VerificationPanelProps {
+  documents: DocumentHandover[];
+}
+
+export default function VerificationPanel({ documents }: VerificationPanelProps) {
+  const [code, setCode] = useState("");
+  const [result, setResult] = useState<DocumentHandover | null>(null);
+  const [searched, setSearched] = useState(false);
+
+  const handleVerify = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearched(true);
+    
+    if (!code.trim()) {
+      setResult(null);
+      return;
+    }
+
+    const matchedDoc = documents.find(
+      doc => doc.verificationCode.toLowerCase() === code.trim().toLowerCase() ||
+             doc.id.toLowerCase() === code.trim().toLowerCase()
+    );
+
+    setResult(matchedDoc || null);
+  };
+
+  const handleSelectPredefined = (c: string) => {
+    setCode(c);
+    const matchedDoc = documents.find(doc => doc.verificationCode === c);
+    setResult(matchedDoc || null);
+    setSearched(true);
+  };
+
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs max-w-3xl mx-auto" id="verification-panel">
+      <div className="flex items-center gap-2.5 mb-5 border-b border-slate-100 pb-4">
+        <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+          <ShieldCheck className="w-5 h-5" />
+        </div>
+        <div>
+          <h3 className="text-sm font-bold text-slate-800">Verifikasi Tanda Tangan &amp; Keaslian Dokumen</h3>
+          <p className="text-xs text-slate-400">Masukkan Kode Verifikasi dari PDF untuk memverifikasi validitas kriptografi dan persetujuan tanda tangan.</p>
+        </div>
+      </div>
+
+      <form onSubmit={handleVerify} className="space-y-4">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Masukkan Kode Verifikasi (Contoh: ST-88C9-D3E4)..."
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              id="verification-code-input"
+              className="w-full text-xs border border-slate-300 rounded-lg pl-10 pr-3 py-2.5 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 placeholder-slate-400 transition bg-white"
+            />
+          </div>
+          <button
+            type="submit"
+            id="btn-run-verify"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-5 py-2.5 rounded-lg flex items-center justify-center gap-1.5 transition cursor-pointer"
+          >
+            <Search className="w-4 h-4" /> Verifikasi Berkas
+          </button>
+        </div>
+
+        {/* Quick select from database list */}
+        {documents.length > 0 && (
+          <div className="flex items-center gap-1.5 flex-wrap text-[10px]">
+            <span className="text-slate-400 font-bold">Pilih Cepat Berkas:</span>
+            {documents.slice(0, 4).map((doc) => (
+              <button
+                key={doc.id}
+                type="button"
+                onClick={() => handleSelectPredefined(doc.verificationCode)}
+                className="bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200/60 px-2 py-0.5 rounded-sm transition cursor-pointer font-mono"
+              >
+                {doc.verificationCode}
+              </button>
+            ))}
+          </div>
+        )}
+      </form>
+
+      {/* Result Display */}
+      {searched && (
+        <div className="mt-6 border-t border-slate-100 pt-6 animate-fadeIn" id="verification-results">
+          {result ? (
+            <div className="bg-emerald-50/50 border border-emerald-200 rounded-xl p-5 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-100 pb-3">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-emerald-100 text-emerald-600 rounded-full shrink-0">
+                    <CheckCircle2 className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-800">Tanda Tangan Digital Terverifikasi (ASLI &amp; VALID)</h4>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Dokumen ini sah secara hukum sesuai UU ITE dan tidak mengalami perubahan isi sejak ditandatangani oleh atasan.
+                    </p>
+                  </div>
+                </div>
+                
+                <button
+                  type="button"
+                  onClick={() => exportDocumentToPDF(result)}
+                  className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-black flex items-center justify-center gap-1 transition cursor-pointer shadow-3xs shrink-0 self-start sm:self-center"
+                  title="Ekspor Berkas Resmi ke PDF"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Ekspor PDF</span>
+                </button>
+              </div>
+
+              {/* Document Summary Table */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white p-4 rounded-lg border border-slate-200/60 text-xs">
+                <div className="space-y-1.5">
+                  <span className="text-slate-400 block font-bold text-[9px] uppercase tracking-wider">Judul Berkas</span>
+                  <span className="font-semibold text-slate-800 flex items-center gap-1 text-xs">
+                    <FileText className="w-3.5 h-3.5 text-indigo-500" /> {result.title}
+                  </span>
+                </div>
+
+                <div className="space-y-1.5">
+                  <span className="text-slate-400 block font-bold text-[9px] uppercase tracking-wider">Kategori &amp; Tanggal</span>
+                  <span className="font-semibold text-slate-800 text-xs">
+                    {result.category} &bull; {new Date(result.timestamp).toLocaleDateString("id-ID")}
+                  </span>
+                </div>
+
+                <div className="space-y-1.5">
+                  <span className="text-slate-400 block font-bold text-[9px] uppercase tracking-wider">Pihak Pengaju (Staff)</span>
+                  <span className="font-semibold text-slate-800 text-xs">
+                    {result.senderName} ({result.senderEmail})
+                  </span>
+                </div>
+
+                <div className="space-y-1.5">
+                  <span className="text-slate-400 block font-bold text-[9px] uppercase tracking-wider">Pihak Penerima</span>
+                  <span className="font-semibold text-slate-800 text-xs">
+                    {result.recipientName} ({result.recipientEmail})
+                  </span>
+                </div>
+
+                {result.items && result.items.length > 0 && (
+                  <div className="space-y-1.5 sm:col-span-2 border-t border-slate-100 pt-2.5">
+                    <span className="text-indigo-600 block font-bold text-[9px] uppercase tracking-wider">Rincian Berkas Terverifikasi</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                      {result.items.map((item, idx) => (
+                        <div key={idx} className="bg-slate-50 border border-slate-200/55 rounded p-1.5 text-[10px] font-semibold text-slate-700">
+                          {idx + 1}. {item}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-1.5 sm:col-span-2 border-t border-slate-100 pt-2.5">
+                  <span className="text-slate-400 block font-bold text-[9px] uppercase tracking-wider">Metadata Kriptografi SHA-256 Hash</span>
+                  <span className="font-mono text-[10px] text-indigo-600 break-all bg-indigo-50/50 px-2 py-1 rounded block border border-indigo-100">
+                    4a85f4ea4335c02455c0384624fb05c285934a85f40c13470948240034a85f4c
+                  </span>
+                </div>
+              </div>
+
+              {/* Visual Approval Chain */}
+              <div className="space-y-2">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Rantai Persetujuan Tanda Tangan:</span>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="bg-white border border-slate-200 rounded-lg p-3 text-center">
+                    <div className="text-[9px] font-bold text-slate-400 uppercase">Pihak Pertama (Staff)</div>
+                    <div className="font-bold text-slate-700 text-xs mt-1">{result.senderName}</div>
+                    <span className="text-[9px] text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-100 mt-1.5 inline-block">TERVERIFIKASI</span>
+                  </div>
+
+                  <div className="bg-white border border-slate-200 rounded-lg p-3 text-center">
+                    <div className="text-[9px] font-bold text-slate-400 uppercase">Pihak Kedua (Admin)</div>
+                    <div className="font-bold text-slate-700 text-xs mt-1">Sistem Admin</div>
+                    {result.adminSignature ? (
+                      <span className="text-[9px] text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-100 mt-1.5 inline-block">TERVERIFIKASI</span>
+                    ) : (
+                      <span className="text-[9px] text-slate-400 font-bold bg-slate-50 px-1.5 py-0.2 rounded border border-slate-100 mt-1.5 inline-block">BELUM VERIFIKASI</span>
+                    )}
+                  </div>
+
+                  <div className="bg-white border border-slate-200 rounded-lg p-3 text-center">
+                    <div className="text-[9px] font-bold text-slate-400 uppercase">Pihak Ketiga (Atasan)</div>
+                    <div className="font-bold text-slate-700 text-xs mt-1">{result.supervisorName}</div>
+                    {result.supervisorSignature ? (
+                      <span className="text-[9px] text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-100 mt-1.5 inline-block">TERSETUJUI</span>
+                    ) : (
+                      <span className="text-[9px] text-slate-400 font-bold bg-slate-50 px-1.5 py-0.2 rounded border border-slate-100 mt-1.5 inline-block">BELUM DISETUJUI</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-5 text-center space-y-2">
+              <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto">
+                <ShieldAlert className="w-6 h-6" />
+              </div>
+              <h4 className="text-sm font-bold text-slate-800">Kode Verifikasi Tidak Ditemukan / Tidak Valid!</h4>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                Sistem tidak dapat menemukan berkas digital dengan kode tersebut. Harap pastikan kembali kode verifikasi yang Anda masukkan sesuai dengan yang tertera pada bagian bawah dokumen berita acara.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

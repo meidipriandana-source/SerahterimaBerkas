@@ -1,0 +1,6 @@
+{
+  "name": "Serah Terima Berkas Digital",
+  "description": "Bukti serah terima berkas digital dengan tanda tangan elektronik, otomatisasi Google Drive & Sheets, dan notifikasi email.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
