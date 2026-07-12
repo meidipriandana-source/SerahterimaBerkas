@@ -3,6 +3,19 @@ import { jsPDF } from "jspdf";
 import { DocumentHandover } from "../types";
 
 export async function exportDocumentToPDF(doc: DocumentHandover): Promise<void> {
+  // Construct scanning/verification URL
+  const verifyUrl = `${window.location.origin}/?verify=${encodeURIComponent(doc.verificationCode)}`;
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(verifyUrl)}`;
+
+  // Wait for the QR code image to fully load in the background to ensure it renders in the canvas
+  await new Promise<void>((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve();
+    img.onerror = () => resolve();
+    img.src = qrCodeUrl;
+  });
+
   // Create an offscreen wrapper element to render the document
   const wrapper = document.createElement("div");
   wrapper.style.position = "absolute";
@@ -98,13 +111,19 @@ export async function exportDocumentToPDF(doc: DocumentHandover): Promise<void> 
       </div>
 
       <!-- Verification and Status Section -->
-      <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 18px; margin-bottom: 25px;">
-        <div>
-          <span style="font-size: 10px; font-weight: bold; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 2px;">Kode Verifikasi</span>
-          <code style="background: #e0e7ff; color: #4338ca; padding: 4px 10px; border-radius: 6px; font-size: 13px; font-weight: 900; font-family: monospace;">${doc.verificationCode}</code>
+      <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px 20px; margin-bottom: 25px;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+          <div style="border: 1px solid #cbd5e1; padding: 4px; background: #ffffff; border-radius: 8px; width: 68px; height: 68px; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <img src="${qrCodeUrl}" style="width: 58px; height: 58px; display: block;" alt="QR Verification" crossorigin="anonymous" />
+          </div>
+          <div>
+            <span style="font-size: 9px; font-weight: bold; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 2px;">Kode Verifikasi &amp; QR Scan</span>
+            <code style="background: #e0e7ff; color: #4338ca; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 900; font-family: monospace; display: inline-block;">${doc.verificationCode}</code>
+            <p style="margin: 3px 0 0 0; font-size: 9px; color: #64748b; font-weight: 500;">Pindai QR Code untuk memeriksa keaslian dokumen via Portal DANA</p>
+          </div>
         </div>
         <div style="text-align: right;">
-          <span style="font-size: 10px; font-weight: bold; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 4px;">Status Dokumen</span>
+          <span style="font-size: 9px; font-weight: bold; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 4px;">Status Dokumen</span>
           <span style="${statusBadgeColor} padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 900; display: inline-block;">${statusText}</span>
         </div>
       </div>
@@ -150,40 +169,51 @@ export async function exportDocumentToPDF(doc: DocumentHandover): Promise<void> 
       ` : ""}
 
       <!-- Signatures Grid -->
-      <div style="margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; text-align: center;">
+      <div style="margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; text-align: center;">
         <div style="border-top: 1px dashed #cbd5e1; padding-top: 15px; background: #fafafa; border-radius: 8px; padding: 12px;">
-          <div style="font-size: 9px; font-weight: bold; color: #64748b; text-transform: uppercase; margin-bottom: 10px;">DIREKOMENDASIKAN OLEH</div>
+          <div style="font-size: 8px; font-weight: bold; color: #64748b; text-transform: uppercase; margin-bottom: 10px;">DIREKOMENDASIKAN OLEH</div>
           ${getSigElement(doc.senderSignature, "Sender", doc.senderName)}
-          <div style="font-size: 12px; font-weight: bold; color: #0f172a;">${doc.senderName}</div>
+          <div style="font-size: 11px; font-weight: bold; color: #0f172a;">${doc.senderName}</div>
           <div style="font-size: 9px; color: #64748b; margin-top: 2px;">Pihak Pertama (Pengaju)</div>
         </div>
 
         <div style="border-top: 1px dashed #cbd5e1; padding-top: 15px; background: #fafafa; border-radius: 8px; padding: 12px;">
-          <div style="font-size: 9px; font-weight: bold; color: #64748b; text-transform: uppercase; margin-bottom: 10px;">DIVERIFIKASI OLEH</div>
+          <div style="font-size: 8px; font-weight: bold; color: #64748b; text-transform: uppercase; margin-bottom: 10px;">DIVERIFIKASI OLEH</div>
           ${getSigElement(doc.adminSignature, "Admin", "Sistem Admin")}
-          <div style="font-size: 12px; font-weight: bold; color: #0f172a;">Sistem Admin</div>
+          <div style="font-size: 11px; font-weight: bold; color: #0f172a;">Sistem Admin</div>
           <div style="font-size: 9px; color: #64748b; margin-top: 2px;">Pihak Kedua (Verifikator)</div>
         </div>
 
-        <div style="border-top: 1px dashed #cbd5e1; padding-top: 15px; background: #fafafa; border-radius: 8px; padding: 12px;">
-          <div style="font-size: 9px; font-weight: bold; color: #64748b; text-transform: uppercase; margin-bottom: 10px;">DISETUJUI OLEH</div>
-          ${getSigElement(doc.supervisorSignature, "Supervisor", doc.supervisorName)}
-          <div style="font-size: 12px; font-weight: bold; color: #0f172a;">${doc.supervisorName}</div>
-          <div style="font-size: 9px; color: #64748b; margin-top: 2px;">Pihak Ketiga (Pemberi Izin)</div>
-        </div>
+        ${(() => {
+          const sups = doc.supervisorName ? doc.supervisorName.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
+          return sups.map((supName: string) => {
+            const sig = doc.supervisorSignatures?.[supName] || (sups.length === 1 ? doc.supervisorSignature : null);
+            return `
+              <div style="border-top: 1px dashed #cbd5e1; padding-top: 15px; background: #fafafa; border-radius: 8px; padding: 12px;">
+                <div style="font-size: 8px; font-weight: bold; color: #64748b; text-transform: uppercase; margin-bottom: 10px;">DISETUJUI OLEH</div>
+                ${getSigElement(sig, "Supervisor", supName)}
+                <div style="font-size: 11px; font-weight: bold; color: #0f172a;">${supName}</div>
+                <div style="font-size: 9px; color: #64748b; margin-top: 2px;">Atasan Penyetuju</div>
+              </div>
+            `;
+          }).join("");
+        })()}
       </div>
 
       <!-- Security Certificate Footer block -->
       <div style="margin-top: 35px; border-top: 1px solid #e2e8f0; padding-top: 20px; display: flex; justify-content: space-between; align-items: flex-end;">
-        <div style="font-size: 10px; color: #64748b; max-width: 75%; line-height: 1.5;">
+        <div style="font-size: 10px; color: #64748b; max-width: 70%; line-height: 1.5;">
           <strong style="color: #475569; display: block; margin-bottom: 3px;">Catatan Keamanan Digital:</strong>
           Dokumen ini ditandatangani secara elektronik menggunakan hash cryptographic <strong>SHA-256</strong> yang aman dan diverifikasi secara real-time. Tanda tangan yang tercantum adalah sah dan mengikat secara hukum sesuai dengan UU ITE yang berlaku di Indonesia.
         </div>
-        <div style="text-align: right; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 10px; background: #ffffff;">
-          <svg width="45" height="45" viewBox="0 0 29 29" style="display: block; margin: 0 auto 2px auto;">
-            <path d="M0 0h9v9H0zm2 2v5h5V2zm11 0h5v2h-2v2h2v3h-5zm7 0h9v9h-9zm2 2v5h5V2zM0 11h5v2H0zm7 0h2v4H7zm11 0h2v2h-2zm3 0h3v2h-3zm5 0h3v5h-2v-3h-1zm-18 4h2v2H0zm4 0h2v5H4zm5 0h2v2H9zm4 0h3v2h-3zm13 1h3v2h-3zm-14 3h2v2-2zm3 0h2v3h-2zm13 0h3v2h-3zm-19 2h3v5H0zm14 0h2v2h-2zm3 1h3v2h-3zm5 0h2v2h-2zm-12 2h2v2h-2zm3 0h5v2h-5z" fill="#4338ca"/>
-          </svg>
-          <span style="font-size: 8px; font-family: monospace; font-weight: bold; color: #4338ca;">SECURED BY DANA</span>
+        <div style="text-align: right; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 12px; background: #ffffff; display: flex; align-items: center; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+          <div style="text-align: left;">
+            <strong style="font-size: 9px; font-family: sans-serif; font-weight: 800; color: #4338ca; display: block; letter-spacing: 0.3px;">VERIFIKASI QR</strong>
+            <span style="font-size: 7px; color: #64748b; display: block; margin-top: 1px;">Pindai untuk Verifikasi</span>
+          </div>
+          <div style="border: 1px solid #f1f5f9; padding: 2px; background: #ffffff; border-radius: 4px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
+            <img src="${qrCodeUrl}" style="width: 38px; height: 38px; display: block;" alt="QR Code" crossorigin="anonymous" />
+          </div>
         </div>
       </div>
 

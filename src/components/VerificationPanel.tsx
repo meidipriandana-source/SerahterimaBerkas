@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Search, ShieldCheck, ShieldAlert, CheckCircle2, Clipboard, Key, RefreshCw, FileText, Download } from "lucide-react";
 import { DocumentHandover } from "../types";
 import { exportDocumentToPDF } from "../utils/pdfExporter";
@@ -11,6 +11,21 @@ export default function VerificationPanel({ documents }: VerificationPanelProps)
   const [code, setCode] = useState("");
   const [result, setResult] = useState<DocumentHandover | null>(null);
   const [searched, setSearched] = useState(false);
+
+  // Auto-verify when URL query contains verify/verification code
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const verifyCode = params.get("verify") || params.get("verification");
+    if (verifyCode && documents.length > 0) {
+      setCode(verifyCode);
+      const matchedDoc = documents.find(
+        doc => doc.verificationCode.toLowerCase() === verifyCode.trim().toLowerCase() ||
+               doc.id.toLowerCase() === verifyCode.trim().toLowerCase()
+      );
+      setResult(matchedDoc || null);
+      setSearched(true);
+    }
+  }, [documents]);
 
   const handleVerify = (e: React.FormEvent) => {
     e.preventDefault();

@@ -19,9 +19,31 @@ export default function SupervisorApprovalInbox({
   const [rejectReason, setRejectReason] = useState("");
   const [showRejectForm, setShowRejectForm] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [activeSigningSupervisor, setActiveSigningSupervisor] = useState("");
 
   // Filter only documents waiting for Atasan signature
   const pendingDocs = documents.filter((doc) => doc.status === "pending_atasan");
+
+  React.useEffect(() => {
+    if (selectedDoc) {
+      const sups = selectedDoc.supervisorName.split(",").map((s) => s.trim()).filter(Boolean);
+      const unsigned = sups.find(sup => !selectedDoc.supervisorSignatures?.[sup]);
+      setActiveSigningSupervisor(unsigned || sups[0]);
+    } else {
+      setActiveSigningSupervisor("");
+    }
+  }, [selectedDoc]);
+
+  React.useEffect(() => {
+    if (selectedDoc) {
+      const updatedDoc = documents.find((d) => d.id === selectedDoc.id);
+      if (updatedDoc && updatedDoc.status === "pending_atasan") {
+        setSelectedDoc(updatedDoc);
+      } else {
+        setSelectedDoc(null);
+      }
+    }
+  }, [documents]);
 
   const handleSupervisorSign = async () => {
     if (!selectedDoc) return;
@@ -35,20 +57,32 @@ export default function SupervisorApprovalInbox({
       const res = await fetch(`/api/documents/${selectedDoc.id}/atasan-sign`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ supervisorSignature })
+        body: JSON.stringify({ 
+          supervisorSignature,
+          supervisorName: activeSigningSupervisor
+        })
       });
 
       if (!res.ok) {
         throw new Error("Gagal menyimpan persetujuan Atasan");
       }
 
-      triggerPushNotification(
-        "Persetujuan Akhir Berhasil",
-        `Dokumen '${selectedDoc.title}' telah ditandatangani penuh. Bukti Serah Terima PDF disimpan ke Google Drive & Email konfirmasi dikirim ke ${selectedDoc.recipientEmail}.`
-      );
+      const allSups = selectedDoc.supervisorName.split(",").map((s) => s.trim()).filter(Boolean);
+      const remainingUnsigned = allSups.filter(s => s !== activeSigningSupervisor && !selectedDoc.supervisorSignatures?.[s]);
 
-      // Clear states
-      setSelectedDoc(null);
+      if (remainingUnsigned.length > 0) {
+        triggerPushNotification(
+          "Persetujuan Atasan Berhasil",
+          `Dokumen '${selectedDoc.title}' berhasil ditandatangani oleh ${activeSigningSupervisor}. Menunggu persetujuan selanjutnya dari: ${remainingUnsigned.join(", ")}.`
+        );
+      } else {
+        triggerPushNotification(
+          "Persetujuan Akhir Berhasil",
+          `Dokumen '${selectedDoc.title}' telah ditandatangani penuh. Bukti Serah Terima PDF disimpan ke Google Drive & Email konfirmasi dikirim ke ${selectedDoc.recipientEmail}.`
+        );
+      }
+
+      // Clear signature pad
       setSupervisorSignature("");
       onActionComplete();
     } catch (err) {
@@ -229,11 +263,11 @@ export default function SupervisorApprovalInbox({
                 <ShieldCheck className="w-4 h-4 text-indigo-600" /> Rantai Validasi Tanda Tangan Elektronik:
               </h4>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {/* Staff Signed */}
                 <div className="border border-slate-200 rounded-lg p-3 bg-white space-y-2 flex flex-col items-center text-center">
                   <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Pihak Pertama (Staff)</span>
-                  <div className="border border-slate-100 rounded-md bg-slate-50 p-1 w-full flex items-center justify-center">
+                  <div className="border border-slate-100 rounded-md bg-slate-50 p-1 w-full flex items-center justify-center h-16">
                     <img src={selectedDoc.senderSignature} alt="TTD Staff" className="h-14 max-w-[150px] object-contain" />
                   </div>
                   <span className="text-[10px] font-bold text-slate-700">{selectedDoc.senderName}</span>
@@ -242,30 +276,92 @@ export default function SupervisorApprovalInbox({
                 {/* Admin Signed */}
                 <div className="border border-indigo-200 rounded-lg p-3 bg-indigo-50/20 space-y-2 flex flex-col items-center text-center">
                   <span className="text-[9px] font-bold text-indigo-700 uppercase tracking-wider">Pihak Kedua (Admin Verifikator)</span>
-                  <div className="border border-indigo-100 rounded-md bg-white p-1 w-full flex items-center justify-center">
+                  <div className="border border-indigo-100 rounded-md bg-white p-1 w-full flex items-center justify-center h-16">
                     <img src={selectedDoc.adminSignature || ""} alt="TTD Admin" className="h-14 max-w-[150px] object-contain" />
                   </div>
-                  <span className="text-[10px] font-bold text-indigo-700 flex items-center gap-1">
+                  <span className="text-[10px] font-bold text-indigo-700 flex items-center justify-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> Sistem Admin (SIGNED)
                   </span>
                 </div>
+
+                {/* Atasan / Supervisors Signed */}
+                {selectedDoc.supervisorName.split(",").map((s) => s.trim()).filter(Boolean).map((supName) => {
+                  const sig = selectedDoc.supervisorSignatures?.[supName];
+                  return (
+                    <div key={supName} className={`border rounded-lg p-3 space-y-2 flex flex-col items-center text-center ${sig ? "border-emerald-200 bg-emerald-50/20" : "border-slate-200 bg-slate-50/30"}`}>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Penyetuju Atasan</span>
+                      <div className="border border-slate-100 rounded-md bg-white p-1 w-full flex items-center justify-center h-16">
+                        {sig ? (
+                          <img src={sig} alt={`TTD ${supName}`} className="h-14 max-w-[150px] object-contain" />
+                        ) : (
+                          <span className="text-[10px] text-slate-400 italic">Belum TTD</span>
+                        )}
+                      </div>
+                      <span className={`text-[10px] font-bold flex items-center justify-center gap-1 ${sig ? "text-emerald-700" : "text-slate-500"}`}>
+                        {sig && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />} {supName}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
             {/* Action TTD Atasan Pad */}
             {!showRejectForm ? (
-              <div className="border-t border-slate-100 pt-5 space-y-3">
-                <h4 className="text-xs font-bold text-slate-700 flex items-center gap-1">
-                  Bubuhkan Tanda Tangan Atasan <span className="text-red-500 ml-0.5">*</span>
-                </h4>
-                <p className="text-[10px] text-slate-400">Silakan gambar tanda tangan Anda di bawah ini sebagai keputusan persetujuan akhir.</p>
-                
-                <SignaturePad
-                  onSave={setSupervisorSignature}
-                  onClear={() => setSupervisorSignature("")}
-                  placeholder={`Tanda tangan ${selectedDoc.supervisorName} di sini...`}
-                  height={120}
-                />
+              <div className="border-t border-slate-100 pt-5 space-y-4">
+                {/* Selector for signing official */}
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-slate-700 flex items-center gap-1">
+                    Pilih Pejabat Atasan yang Menandatangani:
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedDoc.supervisorName.split(",").map((s) => s.trim()).filter(Boolean).map((supName) => {
+                      const isSigned = selectedDoc.supervisorSignatures?.[supName];
+                      const isActive = activeSigningSupervisor === supName;
+                      return (
+                        <button
+                          key={supName}
+                          type="button"
+                          onClick={() => {
+                            setActiveSigningSupervisor(supName);
+                            setSupervisorSignature("");
+                          }}
+                          className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 ${
+                            isActive 
+                              ? "bg-indigo-600 text-white border-transparent shadow-xs scale-[1.02]" 
+                              : isSigned 
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200" 
+                                : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                          }`}
+                        >
+                          {isSigned ? (
+                            <CheckSquare className="w-3.5 h-3.5 text-emerald-500" />
+                          ) : (
+                            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                          )} 
+                          {supName}
+                          {isSigned && <span className="text-[9px] font-normal opacity-85">(Sudah TTD)</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="space-y-1 bg-slate-50/50 p-4 border border-slate-100 rounded-xl">
+                  <h4 className="text-xs font-bold text-slate-700 flex items-center gap-1">
+                    Bubuhkan Tanda Tangan: <span className="text-indigo-600 font-extrabold">{activeSigningSupervisor}</span> <span className="text-red-500 ml-0.5">*</span>
+                  </h4>
+                  <p className="text-[10px] text-slate-400">Silakan gambar tanda tangan Anda di bawah ini sebagai keputusan persetujuan akhir.</p>
+                  
+                  <div className="mt-2.5" key={activeSigningSupervisor}>
+                    <SignaturePad
+                      onSave={setSupervisorSignature}
+                      onClear={() => setSupervisorSignature("")}
+                      placeholder={`Tanda tangan ${activeSigningSupervisor} di sini...`}
+                      height={120}
+                    />
+                  </div>
+                </div>
 
                 <div className="flex gap-2 justify-end pt-3">
                   <button
@@ -281,7 +377,7 @@ export default function SupervisorApprovalInbox({
                     id="btn-supervisor-submit-sign"
                     className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-200 text-white font-bold rounded-lg text-xs flex items-center gap-1 transition cursor-pointer shadow-xs disabled:cursor-not-allowed"
                   >
-                    Tandatangani &amp; Selesaikan Dokumen <CheckCircle2 className="w-3.5 h-3.5" />
+                    Tandatangani Sebagai {activeSigningSupervisor} <CheckCircle2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>

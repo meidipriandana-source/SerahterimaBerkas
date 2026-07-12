@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { 
   FileText, LayoutDashboard, Database, FolderOpen, Mail, ShieldCheck, 
   Settings, Bell, ListTodo, Activity, LogIn, ChevronRight, CheckCircle2, 
-  Clock, Shield, User, CornerDownRight, Menu, X, HelpCircle, Trash2, RefreshCw
+  Clock, Shield, User, UserCheck, CornerDownRight, Menu, X, HelpCircle, Trash2, RefreshCw
 } from "lucide-react";
 import RoleSelector from "./components/RoleSelector";
 import DashboardAnalytics from "./components/DashboardAnalytics";
@@ -136,16 +136,29 @@ export default function App() {
     { id: "dashboard", label: "Dasbor Analitik", icon: LayoutDashboard, count: null },
     { id: "form", label: "Form Serah Terima", icon: FileText, count: null },
     { id: "admin_inbox", label: "Antrean Admin", icon: Shield, count: documents.filter(d => d.status === 'pending_admin').length },
+    { id: "atasan_inbox", label: "Antrean Atasan", icon: UserCheck, count: documents.filter(d => d.status === 'pending_atasan').length },
     { id: "sheets", label: "Google Sheets", icon: Database, count: null },
     { id: "drive", label: "Google Drive", icon: FolderOpen, count: documents.filter(d => d.status === 'completed').length },
     { id: "backup", label: "Backup & Restore", icon: RefreshCw, count: null },
+    { id: "verification", label: "Verifikasi Berkas", icon: ShieldCheck, count: null },
   ];
+
+  // Deep linking for QR code scans
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const verifyCode = params.get("verify") || params.get("verification");
+    if (verifyCode) {
+      setActiveTab("verification");
+    }
+  }, []);
 
   const handleRoleChange = (role: UserRole) => {
     setCurrentRole(role);
     // Auto shift active tab to appropriate panel for testing role pipeline
     if (role === "admin") {
       setActiveTab("admin_inbox");
+    } else if (role === "atasan") {
+      setActiveTab("atasan_inbox");
     } else {
       setActiveTab("form");
     }
@@ -376,6 +389,14 @@ export default function App() {
                     />
                   )}
                   
+                  {activeTab === "atasan_inbox" && (
+                    <SupervisorApprovalInbox 
+                      documents={documents} 
+                      onActionComplete={fetchData}
+                      triggerPushNotification={handleTriggerPushNotification}
+                    />
+                  )}
+                  
                   {activeTab === "sheets" && (
                     <SheetsLiveView 
                       documents={documents} 
@@ -397,6 +418,12 @@ export default function App() {
                       documents={documents} 
                       onRefresh={fetchData} 
                       triggerPushNotification={handleTriggerPushNotification}
+                    />
+                  )}
+
+                  {activeTab === "verification" && (
+                    <VerificationPanel 
+                      documents={documents} 
                     />
                   )}
                 </div>

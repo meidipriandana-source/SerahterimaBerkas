@@ -17,6 +17,7 @@ export interface DocumentHandover {
   supervisorName: string;
   supervisorEmail: string;
   supervisorSignature: string | null; // Base64 image
+  supervisorSignatures?: Record<string, string | null>; // Multiple signatures
   
   adminSignature: string | null; // Base64 image
   

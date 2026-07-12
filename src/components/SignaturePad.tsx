@@ -6,13 +6,15 @@ interface SignaturePadProps {
   onClear?: () => void;
   placeholder?: string;
   height?: number;
+  initialValue?: string | null;
 }
 
 export default function SignaturePad({
   onSave,
   onClear,
   placeholder = "Tulis tanda tangan Anda di sini menggunakan mouse atau jari...",
-  height = 150
+  height = 150,
+  initialValue
 }: SignaturePadProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -36,9 +38,20 @@ export default function SignaturePad({
       ctx.lineJoin = "round";
     }
     
-    // Clear canvas
-    clearCanvas();
-  }, [height]);
+    // Clear canvas internally without triggering state reset callback
+    clearCanvas(false);
+
+    if (initialValue) {
+      const img = new Image();
+      img.onload = () => {
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, rect.width, height);
+          setIsEmpty(false);
+        }
+      };
+      img.src = initialValue;
+    }
+  }, [height, initialValue]);
 
   const getCoordinates = (e: React.MouseEvent | React.TouchEvent) => {
     const canvas = canvasRef.current;
@@ -110,7 +123,7 @@ export default function SignaturePad({
     }
   };
 
-  const clearCanvas = () => {
+  const clearCanvas = (triggerCallback = true) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -133,7 +146,7 @@ export default function SignaturePad({
     }
 
     setIsEmpty(true);
-    if (onClear) onClear();
+    if (triggerCallback && onClear) onClear();
   };
 
   return (

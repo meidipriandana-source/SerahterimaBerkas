@@ -24,6 +24,14 @@ export default function RoleSelector({ currentRole, onRoleChange }: RoleSelector
       color: "border-purple-500 bg-purple-50 text-purple-700",
       activeColor: "ring-2 ring-purple-500 bg-purple-600 text-white border-purple-600",
       desc: "Memverifikasi berkas masuk, menandatanganinya, & merampungkan alur serah terima berkas (Selesai)."
+    },
+    {
+      id: "atasan" as UserRole,
+      title: "Atasan Penyetuju",
+      icon: UserCheck,
+      color: "border-emerald-500 bg-emerald-50 text-emerald-700",
+      activeColor: "ring-2 ring-emerald-500 bg-emerald-600 text-white border-emerald-600",
+      desc: "Meninjau pengajuan berkas, menandatangani persetujuan akhir (sebagai Sekretaris Wadir / Sekretaris Direktur), & menyelesaikan alur kerja."
     }
   ];
 
@@ -55,7 +63,9 @@ export default function RoleSelector({ currentRole, onRoleChange }: RoleSelector
                   isActive
                     ? role.id === "admin"
                       ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white border-transparent shadow-md shadow-purple-600/25 scale-[1.02] ring-2 ring-purple-600/10"
-                      : "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white border-transparent shadow-md shadow-indigo-600/25 scale-[1.02] ring-2 ring-indigo-600/10"
+                      : role.id === "atasan"
+                        ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-transparent shadow-md shadow-emerald-600/25 scale-[1.02] ring-2 ring-emerald-600/10"
+                        : "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white border-transparent shadow-md shadow-indigo-600/25 scale-[1.02] ring-2 ring-indigo-600/10"
                     : "bg-slate-50/50 border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-800 hover:border-slate-300"
                 }`}
               >

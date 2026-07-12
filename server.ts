@@ -312,6 +312,12 @@ async function startServer() {
     const randomHex2 = Math.random().toString(16).substring(2, 6).toUpperCase();
     const verificationCode = `ST-${randomHex}-${randomHex2}`;
 
+    const individualSupervisors = supervisorName ? supervisorName.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
+    const supervisorSignatures: Record<string, string | null> = {};
+    individualSupervisors.forEach((sup: string) => {
+      supervisorSignatures[sup] = null;
+    });
+
     const newDoc: DocumentHandover = {
       id: "doc-" + Date.now(),
       title,
@@ -326,6 +332,7 @@ async function startServer() {
       supervisorName,
       supervisorEmail: supervisorEmail || "supervisor@company.com",
       supervisorSignature: null,
+      supervisorSignatures,
       adminSignature: null,
       status: "pending_admin",
       verificationCode,
@@ -390,10 +397,20 @@ async function startServer() {
     }
 
     doc.adminSignature = adminSignature;
-    doc.status = "completed";
-    doc.sheetsSynced = true; // Auto synced to Sheets database upon Admin signature
-    doc.driveSynced = true;  // Auto uploaded as PDF to Google Drive
-    doc.emailSent = true;    // Real-time confirmation email sent to recipient
+    
+    const hasSupervisor = doc.supervisorName && doc.supervisorName.trim().length > 0;
+    
+    if (hasSupervisor) {
+      doc.status = "pending_atasan";
+      doc.sheetsSynced = true; 
+      doc.driveSynced = false;  
+      doc.emailSent = false;    
+    } else {
+      doc.status = "completed";
+      doc.sheetsSynced = true; 
+      doc.driveSynced = true;  
+      doc.emailSent = true;    
+    }
 
     // Add log
     const newLog: ActivityLog = {
@@ -403,16 +420,20 @@ async function startServer() {
       documentTitle: doc.title,
       actor: "Sistem Admin",
       role: "admin",
-      action: "Persetujuan Akhir & TTD",
-      details: `Admin telah memverifikasi & menandatangani dokumen. Berkas berhasil diunggah ke Google Drive '/Serah_Terima_PDFs/' dan email konfirmasi dikirim ke ${doc.recipientEmail}.`
+      action: hasSupervisor ? "Verifikasi & Teruskan ke Atasan" : "Persetujuan Akhir & TTD",
+      details: hasSupervisor 
+        ? `Admin telah memverifikasi & menandatangani dokumen. Berkas diteruskan ke Atasan (${doc.supervisorName}) untuk persetujuan final.`
+        : `Admin telah memverifikasi & menandatangani dokumen. Berkas berhasil diunggah ke Google Drive '/Serah_Terima_PDFs/' dan email konfirmasi dikirim ke ${doc.recipientEmail}.`
     };
 
     // Add push notification for admin/staff
     const newNotif: PushNotification = {
       id: "notif-" + Date.now(),
       timestamp: new Date().toISOString(),
-      title: "Dokumen Selesai Diproses",
-      message: `Berkas '${doc.title}' telah selesai diverifikasi & ditandatangani oleh Admin, dan disimpan secara permanen.`,
+      title: hasSupervisor ? "Berkas Diteruskan ke Atasan" : "Dokumen Selesai Diproses",
+      message: hasSupervisor
+        ? `Berkas '${doc.title}' telah disetujui Admin dan kini menunggu tanda tangan Atasan: ${doc.supervisorName}.`
+        : `Berkas '${doc.title}' telah selesai diverifikasi & ditandatangani oleh Admin, dan disimpan secara permanen.`,
       documentId: doc.id,
       read: false
     };
@@ -428,7 +449,7 @@ async function startServer() {
   // Supervisor (Atasan) approval & signature (Finalizes document, uploads to GDrive, emails receipt)
   app.post("/api/documents/:id/atasan-sign", (req, res) => {
     const { id } = req.params;
-    const { supervisorSignature } = req.body;
+    const { supervisorSignature, supervisorName } = req.body;
 
     if (!supervisorSignature) {
       return res.status(400).json({ error: "Atasan signature is required" });
@@ -447,10 +468,35 @@ async function startServer() {
       return res.status(400).json({ error: `Document is in status '${doc.status}', atasan signature is not applicable` });
     }
 
+    // Initialize supervisorSignatures map if it doesn't exist
+    if (!doc.supervisorSignatures) {
+      doc.supervisorSignatures = {};
+    }
+
+    const sups = doc.supervisorName ? doc.supervisorName.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
+    
+    // Determine the name of the signing supervisor. 
+    // If none is provided, default to the first supervisor in the list or the only supervisor.
+    const signerName = supervisorName || sups[0] || doc.supervisorName;
+
+    // Save this signature
+    doc.supervisorSignatures[signerName] = supervisorSignature;
+    
+    // For backwards-compatibility/fallback, also save to main supervisorSignature field
     doc.supervisorSignature = supervisorSignature;
-    doc.status = "completed";
-    doc.driveSynced = true; // Auto uploaded as PDF to Google Drive
-    doc.emailSent = true;   // Real-time confirmation email sent to recipient
+
+    // Check if ALL chosen supervisors have signed
+    const allSigned = sups.every((supName: string) => doc.supervisorSignatures[supName]);
+
+    if (allSigned) {
+      doc.status = "completed";
+      doc.driveSynced = true; // Auto uploaded as PDF to Google Drive
+      doc.emailSent = true;   // Real-time confirmation email sent to recipient
+    } else {
+      doc.status = "pending_atasan"; // Still pending remaining supervisors
+      doc.driveSynced = false;
+      doc.emailSent = false;
+    }
 
     // Add log
     const newLog: ActivityLog = {
@@ -458,18 +504,22 @@ async function startServer() {
       timestamp: new Date().toISOString(),
       documentId: doc.id,
       documentTitle: doc.title,
-      actor: doc.supervisorName,
+      actor: signerName,
       role: "atasan",
-      action: "Persetujuan Akhir (Signed)",
-      details: `Atasan ${doc.supervisorName} menyetujui & menandatangani berkas secara digital. PDF berhasil diunggah ke Google Drive '/Serah_Terima_PDFs/' dan email konfirmasi dikirim ke ${doc.recipientEmail}.`
+      action: allSigned ? "Persetujuan Akhir (Signed)" : "Persetujuan Atasan (Signed)",
+      details: allSigned
+        ? `Atasan ${signerName} menyetujui & menandatangani berkas secara digital. Semua tanda tangan lengkap! PDF berhasil diunggah ke Google Drive '/Serah_Terima_PDFs/' dan email konfirmasi dikirim ke ${doc.recipientEmail}.`
+        : `Atasan ${signerName} menyetujui & menandatangani berkas secara digital. Menunggu tanda tangan dari penyetuju lainnya.`
     };
 
     // Add notification
     const newNotif: PushNotification = {
       id: "notif-" + Date.now(),
       timestamp: new Date().toISOString(),
-      title: "Dokumen Selesai Diproses",
-      message: `Dokumen '${doc.title}' telah ditandatangani lengkap oleh Admin & Atasan, dan dikirim ke penerima.`,
+      title: allSigned ? "Dokumen Selesai Diproses" : "Dokumen Ditandatangani Atasan",
+      message: allSigned
+        ? `Dokumen '${doc.title}' telah ditandatangani lengkap oleh Admin & seluruh Atasan, dan dikirim ke penerima.`
+        : `Dokumen '${doc.title}' telah ditandatangani oleh ${signerName} dan sedang menunggu persetujuan Atasan lainnya.`,
       documentId: doc.id,
       read: false
     };

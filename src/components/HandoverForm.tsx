@@ -27,23 +27,78 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
   ];
 
   // Form fields
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("Telaah Diklat/Pelatihan");
+  const [title, setTitle] = useState(() => localStorage.getItem("handover_form_title") || "");
+  const [description, setDescription] = useState(() => localStorage.getItem("handover_form_description") || "");
+  const [category, setCategory] = useState(() => localStorage.getItem("handover_form_category") || "Telaah Diklat/Pelatihan");
   const [senderName, setSenderName] = useState("Meidi Priandana");
   const [senderEmail, setSenderEmail] = useState("meidipriandana@gmail.com");
-  const [recipientName, setRecipientName] = useState("Sekretaris Direktur");
-  const [recipientPersonName, setRecipientPersonName] = useState("Aina Mardiana");
-  const [recipientEmail, setRecipientEmail] = useState("aina.mardiana@company.com");
-  const [supervisor1, setSupervisor1] = useState("dr. Budy Azis B, Sp.PK.,M.H.");
-  const [supervisor2, setSupervisor2] = useState("");
-  const [supervisor3, setSupervisor3] = useState("");
-  const [senderSignature, setSenderSignature] = useState("");
+  const [recipientName, setRecipientName] = useState(() => localStorage.getItem("handover_form_recipientName") || "Sekretaris Direktur");
+  const [recipientPersonName, setRecipientPersonName] = useState(() => localStorage.getItem("handover_form_recipientPersonName") || "Aina Mardiana");
+  const [recipientEmail, setRecipientEmail] = useState(() => localStorage.getItem("handover_form_recipientEmail") || "aina.mardiana@company.com");
+  const [supervisor1, setSupervisor1] = useState(() => localStorage.getItem("handover_form_supervisor1") || "dr. Budy Azis B, Sp.PK.,M.H.");
+  const [supervisor2, setSupervisor2] = useState(() => localStorage.getItem("handover_form_supervisor2") || "");
+  const [supervisor3, setSupervisor3] = useState(() => localStorage.getItem("handover_form_supervisor3") || "");
+  const [senderSignature, setSenderSignature] = useState(() => localStorage.getItem("handover_form_senderSignature") || "");
   
   // Dynamic list of items/documents to hand over
-  const [items, setItems] = useState<string[]>([]);
+  const [items, setItems] = useState<string[]>(() => {
+    const saved = localStorage.getItem("handover_form_items");
+    return saved ? JSON.parse(saved) : [];
+  });
   const [newItemName, setNewItemName] = useState("");
-  const [checkedItems, setCheckedItems] = useState<Record<string, { returned: boolean; timestamp: string }>>({});
+  const [checkedItems, setCheckedItems] = useState<Record<string, { returned: boolean; timestamp: string }>>(() => {
+    const saved = localStorage.getItem("handover_form_checkedItems");
+    return saved ? JSON.parse(saved) : {};
+  });
+  
+  // Auto-save form fields to localStorage
+  useEffect(() => {
+    localStorage.setItem("handover_form_title", title);
+  }, [title]);
+
+  useEffect(() => {
+    localStorage.setItem("handover_form_description", description);
+  }, [description]);
+
+  useEffect(() => {
+    localStorage.setItem("handover_form_category", category);
+  }, [category]);
+
+  useEffect(() => {
+    localStorage.setItem("handover_form_recipientName", recipientName);
+  }, [recipientName]);
+
+  useEffect(() => {
+    localStorage.setItem("handover_form_recipientPersonName", recipientPersonName);
+  }, [recipientPersonName]);
+
+  useEffect(() => {
+    localStorage.setItem("handover_form_recipientEmail", recipientEmail);
+  }, [recipientEmail]);
+
+  useEffect(() => {
+    localStorage.setItem("handover_form_supervisor1", supervisor1);
+  }, [supervisor1]);
+
+  useEffect(() => {
+    localStorage.setItem("handover_form_supervisor2", supervisor2);
+  }, [supervisor2]);
+
+  useEffect(() => {
+    localStorage.setItem("handover_form_supervisor3", supervisor3);
+  }, [supervisor3]);
+
+  useEffect(() => {
+    localStorage.setItem("handover_form_senderSignature", senderSignature);
+  }, [senderSignature]);
+
+  useEffect(() => {
+    localStorage.setItem("handover_form_items", JSON.stringify(items));
+  }, [items]);
+
+  useEffect(() => {
+    localStorage.setItem("handover_form_checkedItems", JSON.stringify(checkedItems));
+  }, [checkedItems]);
   
   // Inline editing state for document items
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
@@ -85,7 +140,9 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
   // Hardcoded supervisor list
   const supervisors = [
     { name: "dr. Budy Azis B, Sp.PK.,M.H.", email: "budy.azis@company.com" },
-    { name: "Aripuddin Maskur, S.E.,M.M", email: "aripuddin.maskur@company.com" }
+    { name: "Aripuddin Maskur, S.E.,M.M", email: "aripuddin.maskur@company.com" },
+    { name: "Sekretaris Wadir", email: "sekretaris.wadir@company.com" },
+    { name: "Sekretaris Direktur", email: "sekretaris.direktur@company.com" }
   ];
 
   // Hardcoded categories
@@ -827,6 +884,7 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
             onSave={handleSignatureSave} 
             onClear={handleSignatureClear}
             placeholder="Tulis tanda tangan Anda (Staff Pengaju) di sini..."
+            initialValue={senderSignature}
           />
         </div>
       </div>
