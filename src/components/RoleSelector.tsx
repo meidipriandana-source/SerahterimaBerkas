@@ -1,5 +1,5 @@
 import React from "react";
-import { User, Shield, UserCheck, AlertCircle } from "lucide-react";
+import { User, Shield, UserCheck } from "lucide-react";
 import { UserRole } from "../types";
 
 interface RoleSelectorProps {
@@ -74,14 +74,6 @@ export default function RoleSelector({ currentRole, onRoleChange }: RoleSelector
               </button>
             );
           })}
-        </div>
-      </div>
-
-      <div className="mt-4 bg-slate-50 border-l-4 border-indigo-500 p-3.5 rounded-r-xl flex items-start gap-3">
-        <AlertCircle className="w-4 h-4 text-indigo-500 mt-0.5 shrink-0" />
-        <div className="text-xs text-slate-600 leading-relaxed">
-          <span className="font-extrabold text-slate-800 font-display">Panduan Peran Aktif: </span>
-          {roles.find((r) => r.id === currentRole)?.desc}
         </div>
       </div>
     </div>

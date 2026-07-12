@@ -311,80 +311,10 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
     );
   }
 
-  // Compute statistics for integrated form summary
-  const total = documents.length;
-  const pendingAdmin = documents.filter(d => d.status === "pending_admin").length;
-  const pendingAtasan = documents.filter(d => d.status === "pending_atasan").length;
-  const completed = documents.filter(d => d.status === "completed").length;
-
-  const statsList = [
-    {
-      title: "Total Berkas",
-      value: total,
-      desc: "Semua pengajuan berkas masuk",
-      icon: FileText,
-      color: "bg-indigo-50 border-indigo-100 text-indigo-700"
-    },
-    {
-      title: "Menunggu Admin",
-      value: pendingAdmin,
-      desc: "Butuh verifikasi & TTD Admin",
-      icon: Clock,
-      color: "bg-purple-50 border-purple-100 text-purple-700"
-    },
-    {
-      title: "Menunggu Atasan",
-      value: pendingAtasan,
-      desc: "Menunggu persetujuan Atasan",
-      icon: AlertTriangle,
-      color: "bg-amber-50 border-amber-100 text-amber-700"
-    },
-    {
-      title: "Selesai (Valid)",
-      value: completed,
-      desc: "Berkas ditandatangani lengkap",
-      icon: CheckCircle2,
-      color: "bg-emerald-50 border-emerald-100 text-emerald-700"
-    }
-  ];
-
   return (
     <div className="space-y-5 max-w-3xl mx-auto">
-      {/* Integrated Statistics Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3" id="form-stats-grid">
-        {statsList.map((stat, idx) => {
-          const Icon = stat.icon;
-          return (
-            <div 
-              key={idx}
-              className="p-3.5 bg-white rounded-xl border border-slate-200/80 shadow-3xs flex flex-col justify-between transition-transform hover:-translate-y-0.5 duration-200"
-            >
-              <div className="flex items-center justify-between gap-1.5">
-                <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider">{stat.title}</span>
-                <div className={`p-1.5 rounded-md ${stat.color}`}>
-                  <Icon className="w-3.5 h-3.5 shrink-0" />
-                </div>
-              </div>
-              <div className="mt-2.5">
-                <span className="text-xl font-black text-slate-800">{stat.value}</span>
-                <p className="text-[9px] text-slate-400 font-bold leading-tight mt-0.5">{stat.desc}</p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
       <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden" id="handover-form">
-      {/* Header Form */}
-      <div className="bg-white px-6 py-4 border-b border-slate-200 text-slate-800 flex items-center gap-3">
-        <div className="p-2 bg-indigo-50 rounded-lg">
-          <FileText className="w-5 h-5 text-indigo-600" />
-        </div>
-        <div>
-          <h2 className="text-sm font-bold tracking-wide text-slate-850 uppercase">FORMULIR SERAH TERIMA BERKAS DIGITAL</h2>
-          <p className="text-[11px] text-slate-500">Daftarkan dokumen untuk ditandatangani Admin &amp; Atasan secara sah.</p>
-        </div>
-      </div>
+      {/* Header Form - Removed as requested */}
 
       <div className="p-6 space-y-6">
         {/* Section 1: Detail Berkas */}

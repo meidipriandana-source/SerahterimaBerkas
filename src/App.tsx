@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { 
-  FileText, LayoutDashboard, Database, FolderOpen, Mail, ShieldCheck, 
+  FileText, Database, FolderOpen, Mail, ShieldCheck, 
   Settings, Bell, ListTodo, Activity, LogIn, ChevronRight, CheckCircle2, 
   Clock, Shield, User, UserCheck, CornerDownRight, Menu, X, HelpCircle, Trash2, RefreshCw
 } from "lucide-react";
 import RoleSelector from "./components/RoleSelector";
-import DashboardAnalytics from "./components/DashboardAnalytics";
 import HandoverForm from "./components/HandoverForm";
 import AdminApprovalInbox from "./components/AdminApprovalInbox";
 import SupervisorApprovalInbox from "./components/SupervisorApprovalInbox";
@@ -28,7 +27,7 @@ export default function App() {
   const [notifications, setNotifications] = useState<PushNotification[]>([]);
   
   // App UI State
-  const [activeTab, setActiveTab] = useState<string>("dashboard");
+  const [activeTab, setActiveTab] = useState<string>("form");
   const [isLoading, setIsLoading] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showConfigModal, setShowConfigModal] = useState(false);
@@ -133,7 +132,6 @@ export default function App() {
 
   // Sidebar Tabs Config
   const tabs = [
-    { id: "dashboard", label: "Dasbor Analitik", icon: LayoutDashboard, count: null },
     { id: "form", label: "Form Serah Terima", icon: FileText, count: null },
     { id: "admin_inbox", label: "Antrean Admin", icon: Shield, count: documents.filter(d => d.status === 'pending_admin').length },
     { id: "atasan_inbox", label: "Antrean Atasan", icon: UserCheck, count: documents.filter(d => d.status === 'pending_atasan').length },
@@ -369,10 +367,6 @@ export default function App() {
 
                 {/* Main Tabs panels wrapper */}
                 <div className="transition-all duration-300">
-                  {activeTab === "dashboard" && (
-                    <DashboardAnalytics documents={documents} />
-                  )}
-                  
                   {activeTab === "form" && (
                     <HandoverForm 
                       onSuccessSubmit={fetchData} 
@@ -427,80 +421,6 @@ export default function App() {
                     />
                   )}
                 </div>
-
-                {/* Sidebar-like Activity stream at bottom of Dashboard */}
-                {activeTab === "dashboard" && (
-                  <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs" id="activity-logs-card">
-                    <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-2">
-                      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <Activity className="w-4 h-4 text-slate-400" />
-                        Alur &amp; Log Aktivitas Sinkronisasi Terbaru
-                      </h3>
-                      <button
-                        onClick={handleClearLogs}
-                        className="text-[10px] text-slate-500 hover:text-red-500 font-extrabold flex items-center gap-1 transition-colors px-2.5 py-1 rounded-md hover:bg-slate-50 border border-slate-200 cursor-pointer shadow-3xs"
-                        title="Bersihkan Semua Log"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                        Clean
-                      </button>
-                    </div>
-                    
-                    <div className="space-y-3.5">
-                      {logs.slice(0, 5).map((log) => {
-                        const isCompleted = log.action.includes("Selesai") || log.action.includes("Signed");
-                        const isRejected = log.action.includes("Penolakan");
-                        const isPending = !isCompleted && !isRejected;
-
-                        return (
-                          <div key={log.id} className="flex gap-3 text-xs items-start">
-                            {/* Timeline Circle */}
-                            <div className="mt-1 shrink-0">
-                              {isCompleted ? (
-                                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-4 ring-emerald-100" />
-                              ) : isRejected ? (
-                                <div className="w-2.5 h-2.5 rounded-full bg-red-500 ring-4 ring-red-100" />
-                              ) : (
-                                <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 ring-4 ring-indigo-100" />
-                              )}
-                            </div>
-
-                            {/* Log Text */}
-                            <div className="flex-1 space-y-1">
-                              <div className="flex flex-wrap items-center gap-1.5">
-                                <span className="font-bold text-slate-800">{log.actor}</span>
-                                <span className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded-full uppercase ${
-                                  log.role === 'admin' 
-                                    ? 'bg-indigo-100 text-indigo-800' 
-                                    : log.role === 'atasan' 
-                                    ? 'bg-emerald-100 text-emerald-800' 
-                                    : 'bg-slate-100 text-slate-800'
-                                }`}>
-                                  {log.role}
-                                </span>
-                                <span className="text-[10px] text-slate-400 font-medium">
-                                  &bull; {log.action}
-                                </span>
-                                <span className="text-[9px] text-slate-400 ml-auto font-mono">
-                                  {new Date(log.timestamp).toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' })}
-                                </span>
-                              </div>
-                              
-                              <p className="text-slate-500 text-[11px] font-sans leading-relaxed flex items-center gap-1">
-                                <CornerDownRight className="w-3.5 h-3.5 text-slate-300 shrink-0" />
-                                {log.details}
-                              </p>
-                            </div>
-                          </div>
-                        );
-                      })}
-
-                      {logs.length === 0 && (
-                        <p className="text-slate-400 text-center py-4">Belum ada rekaman aktivitas digital.</p>
-                      )}
-                    </div>
-                  </div>
-                )}
 
                 {/* Footer Status Bar matches Design HTML */}
                 <div className="flex flex-col justify-between items-center bg-white p-3 rounded-xl border border-slate-200 shadow-xs gap-3">
