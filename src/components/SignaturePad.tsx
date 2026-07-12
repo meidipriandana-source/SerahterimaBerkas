@@ -19,6 +19,7 @@ export default function SignaturePad({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isEmpty, setIsEmpty] = useState(true);
+  const lastGeneratedSignatureRef = useRef<string | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -38,6 +39,11 @@ export default function SignaturePad({
       ctx.lineJoin = "round";
     }
     
+    // If the initialValue is what we just generated, skip redrawing
+    if (initialValue && initialValue === lastGeneratedSignatureRef.current) {
+      return;
+    }
+
     // Clear canvas internally without triggering state reset callback
     clearCanvas(false);
 
@@ -119,6 +125,7 @@ export default function SignaturePad({
     const canvas = canvasRef.current;
     if (canvas) {
       const dataUrl = canvas.toDataURL();
+      lastGeneratedSignatureRef.current = dataUrl;
       onSave(dataUrl);
     }
   };
@@ -146,6 +153,7 @@ export default function SignaturePad({
     }
 
     setIsEmpty(true);
+    lastGeneratedSignatureRef.current = null;
     if (triggerCallback && onClear) onClear();
   };
 

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Folder, FileText, ExternalLink, Calendar, Search, RefreshCw, X, Printer, Download, Trash2, AlertTriangle, FolderPlus } from "lucide-react";
+import { Folder, FileText, ExternalLink, Calendar, Search, RefreshCw, X, Printer, Download, Trash2, AlertTriangle, FolderPlus, Lock } from "lucide-react";
 import { DocumentHandover } from "../types";
-import { exportDocumentToPDF } from "../utils/pdfExporter";
+import { exportDocumentToPDF, generateDocumentHTML, getDocumentHtmlBlobUrl } from "../utils/pdfExporter";
 
 interface DriveLiveViewProps {
   documents: DocumentHandover[];
@@ -133,12 +133,36 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
 
   const handleDeleteSelected = () => {
     if (selectedIds.length === 0) return;
-    setDeleteModal({
-      isOpen: true,
-      ids: selectedIds,
-      description: `Apakah Anda yakin ingin menghapus ${selectedIds.length} berkas bukti serah terima yang terpilih secara permanen? Tindakan ini tidak dapat dibatalkan.`,
-      errorMessage: "",
-    });
+    
+    // Filter out completed (read-only) documents
+    const selectedDocs = documents.filter(doc => selectedIds.includes(doc.id));
+    const completedSelected = selectedDocs.filter(doc => doc.status === "completed");
+    
+    if (completedSelected.length > 0) {
+      const nonCompletedIds = selectedDocs.filter(doc => doc.status !== "completed").map(doc => doc.id);
+      if (nonCompletedIds.length === 0) {
+        setDeleteModal({
+          isOpen: true,
+          ids: [],
+          description: "Berkas yang sudah selesai ditandatangani bersifat Read-Only (Terkunci) dan tidak dapat dihapus demi keamanan dokumen final.",
+          errorMessage: "Aksi dibatalkan: Dokumen final tidak boleh dihapus.",
+        });
+      } else {
+        setDeleteModal({
+          isOpen: true,
+          ids: nonCompletedIds,
+          description: `Pilihan Anda berisi dokumen final yang sudah selesai ditandatangani (Read-Only). Hanya ${nonCompletedIds.length} berkas yang berstatus draf/proses yang akan dihapus secara permanen. Dokumen final akan dikecualikan secara aman.`,
+          errorMessage: "",
+        });
+      }
+    } else {
+      setDeleteModal({
+        isOpen: true,
+        ids: selectedIds,
+        description: `Apakah Anda yakin ingin menghapus ${selectedIds.length} berkas bukti serah terima yang terpilih secara permanen? Tindakan ini tidak dapat dibatalkan.`,
+        errorMessage: "",
+      });
+    }
   };
 
   const handleDeleteSingle = (docId: string, docTitle: string, e?: React.MouseEvent) => {
@@ -539,15 +563,28 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
                       <Download className="w-3 h-3" />
                     </button>
 
-                    <button
-                      type="button"
-                      onClick={(e) => handleDeleteSingle(doc.id, doc.title, e)}
-                      id={`btn-delete-card-${doc.id}`}
-                      className="p-1 bg-white hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-md border border-slate-200 transition cursor-pointer shadow-3xs"
-                      title="Hapus berkas permanen"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </button>
+                    {doc.status === "completed" ? (
+                      <span
+                        className="p-1 bg-slate-50 text-slate-400 rounded-md border border-slate-200 cursor-not-allowed flex items-center justify-center"
+                        title="Berkas Selesai (Read-Only) - Tidak dapat dihapus"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                        }}
+                      >
+                        <Lock className="w-3 h-3 text-amber-500" />
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={(e) => handleDeleteSingle(doc.id, doc.title, e)}
+                        id={`btn-delete-card-${doc.id}`}
+                        className="p-1 bg-white hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-md border border-slate-200 transition cursor-pointer shadow-3xs"
+                        title="Hapus berkas permanen"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    )}
                   </div>
 
                   <div className="my-3 flex flex-col items-center">
@@ -589,16 +626,26 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
               </div>
               
               <div className="flex items-center gap-2">
-                <button 
-                  onClick={(e) => handleDeleteSingle(selectedDoc.id, selectedDoc.title, e)}
-                  id="btn-delete-pdf-viewer"
-                  className="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
-                  title="Hapus Berkas Permanen"
-                >
-                  <Trash2 className="w-3.5 h-3.5" /> Hapus
-                </button>
+                {selectedDoc.status === "completed" ? (
+                  <span 
+                    className="p-1.5 bg-slate-700 text-slate-300 border border-slate-600 rounded-lg text-xs font-semibold flex items-center gap-1"
+                    title="Dokumen Selesai - Bersifat Read-Only"
+                  >
+                    <Lock className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="text-[11px] text-amber-400 font-bold uppercase tracking-wider">Read-Only</span>
+                  </span>
+                ) : (
+                  <button 
+                    onClick={(e) => handleDeleteSingle(selectedDoc.id, selectedDoc.title, e)}
+                    id="btn-delete-pdf-viewer"
+                    className="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
+                    title="Hapus Berkas Permanen"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" /> Hapus
+                  </button>
+                )}
                 <a 
-                  href={`/api/download-pdf/${selectedDoc.id}`} 
+                  href={getDocumentHtmlBlobUrl(selectedDoc)} 
                   target="_blank" 
                   rel="noreferrer"
                   id="btn-print-doc"
@@ -630,9 +677,9 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
             <div className="flex-1 bg-slate-200 p-4 overflow-y-auto">
               <div className="w-full h-full bg-white rounded-lg shadow-sm border border-slate-300 overflow-hidden">
                 <iframe 
-                  src={`/api/download-pdf/${selectedDoc.id}`} 
+                  srcDoc={generateDocumentHTML(selectedDoc)} 
                   title={`PDF pratinjau - ${selectedDoc.title}`}
-                  className="w-full h-full border-0"
+                  className="w-full h-full border-0 bg-white"
                 />
               </div>
             </div>

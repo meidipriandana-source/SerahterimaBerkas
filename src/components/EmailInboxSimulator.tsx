@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Mail, Search, Trash2, ChevronRight, Inbox, Clock, Paperclip, Send, ExternalLink, Download } from "lucide-react";
 import { DocumentHandover } from "../types";
-import { exportDocumentToPDF } from "../utils/pdfExporter";
+import { exportDocumentToPDF, getDocumentHtmlBlobUrl } from "../utils/pdfExporter";
 
 interface EmailInboxSimulatorProps {
   documents: DocumentHandover[];
@@ -178,7 +178,7 @@ export default function EmailInboxSimulator({ documents }: EmailInboxSimulatorPr
 
                         <div className="flex items-center gap-1.5">
                           <a 
-                            href={`/api/download-pdf/${selectedMail.id}`} 
+                            href={getDocumentHtmlBlobUrl(selectedMail)} 
                             target="_blank" 
                             rel="noreferrer"
                             className="p-1 bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 rounded-md text-[10px] font-bold flex items-center gap-0.5"
