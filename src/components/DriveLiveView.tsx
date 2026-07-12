@@ -47,16 +47,19 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
   });
   
   // Custom delete confirmation modal state
+  const [confirmBypassChecked, setConfirmBypassChecked] = useState(false);
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
     ids: string[];
     description: string;
     errorMessage: string;
+    isCompletedWarning?: boolean;
   }>({
     isOpen: false,
     ids: [],
     description: "",
     errorMessage: "",
+    isCompletedWarning: false,
   });
 
   const handleOpenMoveModal = (fileIds: string[], e?: React.MouseEvent) => {
@@ -134,33 +137,26 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
   const handleDeleteSelected = () => {
     if (selectedIds.length === 0) return;
     
-    // Filter out completed (read-only) documents
     const selectedDocs = documents.filter(doc => selectedIds.includes(doc.id));
     const completedSelected = selectedDocs.filter(doc => doc.status === "completed");
     
+    setConfirmBypassChecked(false);
+    
     if (completedSelected.length > 0) {
-      const nonCompletedIds = selectedDocs.filter(doc => doc.status !== "completed").map(doc => doc.id);
-      if (nonCompletedIds.length === 0) {
-        setDeleteModal({
-          isOpen: true,
-          ids: [],
-          description: "Berkas yang sudah selesai ditandatangani bersifat Read-Only (Terkunci) dan tidak dapat dihapus demi keamanan dokumen final.",
-          errorMessage: "Aksi dibatalkan: Dokumen final tidak boleh dihapus.",
-        });
-      } else {
-        setDeleteModal({
-          isOpen: true,
-          ids: nonCompletedIds,
-          description: `Pilihan Anda berisi dokumen final yang sudah selesai ditandatangani (Read-Only). Hanya ${nonCompletedIds.length} berkas yang berstatus draf/proses yang akan dihapus secara permanen. Dokumen final akan dikecualikan secara aman.`,
-          errorMessage: "",
-        });
-      }
+      setDeleteModal({
+        isOpen: true,
+        ids: selectedIds,
+        description: `Pilihan Anda berisi ${completedSelected.length} berkas final yang sudah selesai ditandatangani (Read-Only). Menghapus berkas ini akan menghapusnya secara permanen dari server dan Google Drive.`,
+        errorMessage: "",
+        isCompletedWarning: true,
+      });
     } else {
       setDeleteModal({
         isOpen: true,
         ids: selectedIds,
         description: `Apakah Anda yakin ingin menghapus ${selectedIds.length} berkas bukti serah terima yang terpilih secara permanen? Tindakan ini tidak dapat dibatalkan.`,
         errorMessage: "",
+        isCompletedWarning: false,
       });
     }
   };
@@ -170,11 +166,19 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
       e.preventDefault();
       e.stopPropagation();
     }
+    const doc = documents.find(d => d.id === docId);
+    const isCompleted = doc?.status === "completed";
+    
+    setConfirmBypassChecked(false);
+    
     setDeleteModal({
       isOpen: true,
       ids: [docId],
-      description: `Apakah Anda yakin ingin menghapus berkas "${docTitle}" secara permanen? Tindakan ini tidak dapat dibatalkan.`,
+      description: isCompleted 
+        ? `Berkas "${docTitle}" telah selesai ditandatangani (Read-Only). Menghapus berkas ini akan menghapusnya secara permanen dari server dan Google Drive.`
+        : `Apakah Anda yakin ingin menghapus berkas "${docTitle}" secara permanen? Tindakan ini tidak dapat dibatalkan.`,
       errorMessage: "",
+      isCompletedWarning: isCompleted,
     });
   };
 
@@ -235,6 +239,10 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
   const executeDelete = async () => {
     const ids = deleteModal.ids;
     if (ids.length === 0) return;
+    if (deleteModal.isCompletedWarning && !confirmBypassChecked) {
+      setDeleteModal(prev => ({ ...prev, errorMessage: "Silakan contreng persetujuan terlebih dahulu." }));
+      return;
+    }
 
     setIsDeleting(true);
     setDeleteModal(prev => ({ ...prev, errorMessage: "" }));
@@ -563,28 +571,20 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
                       <Download className="w-3 h-3" />
                     </button>
 
-                    {doc.status === "completed" ? (
-                      <span
-                        className="p-1 bg-slate-50 text-slate-400 rounded-md border border-slate-200 cursor-not-allowed flex items-center justify-center"
-                        title="Berkas Selesai (Read-Only) - Tidak dapat dihapus"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                        }}
-                      >
-                        <Lock className="w-3 h-3 text-amber-500" />
-                      </span>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={(e) => handleDeleteSingle(doc.id, doc.title, e)}
-                        id={`btn-delete-card-${doc.id}`}
-                        className="p-1 bg-white hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-md border border-slate-200 transition cursor-pointer shadow-3xs"
-                        title="Hapus berkas permanen"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={(e) => handleDeleteSingle(doc.id, doc.title, e)}
+                      id={`btn-delete-card-${doc.id}`}
+                      className="p-1 bg-white hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-md border border-slate-200 transition cursor-pointer shadow-3xs relative"
+                      title={doc.status === "completed" ? "Hapus berkas final (Membutuhkan konfirmasi ekstra)" : "Hapus berkas permanen"}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      {doc.status === "completed" && (
+                        <span className="absolute -top-1 -right-1 bg-amber-500 rounded-full p-0.5" style={{ transform: "scale(0.7)" }}>
+                          <Lock className="w-2.5 h-2.5 text-white stroke-[3px]" />
+                        </span>
+                      )}
+                    </button>
                   </div>
 
                   <div className="my-3 flex flex-col items-center">
@@ -626,7 +626,7 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
               </div>
               
               <div className="flex items-center gap-2">
-                {selectedDoc.status === "completed" ? (
+                {selectedDoc.status === "completed" && (
                   <span 
                     className="p-1.5 bg-slate-700 text-slate-300 border border-slate-600 rounded-lg text-xs font-semibold flex items-center gap-1"
                     title="Dokumen Selesai - Bersifat Read-Only"
@@ -634,16 +634,15 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
                     <Lock className="w-3.5 h-3.5 text-amber-400" />
                     <span className="text-[11px] text-amber-400 font-bold uppercase tracking-wider">Read-Only</span>
                   </span>
-                ) : (
-                  <button 
-                    onClick={(e) => handleDeleteSingle(selectedDoc.id, selectedDoc.title, e)}
-                    id="btn-delete-pdf-viewer"
-                    className="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
-                    title="Hapus Berkas Permanen"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" /> Hapus
-                  </button>
                 )}
+                <button 
+                  onClick={(e) => handleDeleteSingle(selectedDoc.id, selectedDoc.title, e)}
+                  id="btn-delete-pdf-viewer"
+                  className="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
+                  title={selectedDoc.status === "completed" ? "Hapus berkas final (Membutuhkan konfirmasi ekstra)" : "Hapus Berkas Permanen"}
+                >
+                  <Trash2 className="w-3.5 h-3.5" /> Hapus
+                </button>
                 <a 
                   href={getDocumentHtmlBlobUrl(selectedDoc)} 
                   target="_blank" 
@@ -703,6 +702,21 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
               </div>
             </div>
 
+            {deleteModal.isCompletedWarning && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 px-3.5 flex items-start gap-2.5 my-1">
+                <input
+                  type="checkbox"
+                  id="checkbox-confirm-bypass"
+                  checked={confirmBypassChecked}
+                  onChange={(e) => setConfirmBypassChecked(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500 cursor-pointer shrink-0"
+                />
+                <label htmlFor="checkbox-confirm-bypass" className="text-[11px] text-amber-800 font-bold select-none cursor-pointer leading-tight">
+                  Ya, saya mengerti berkas ini berstatus SELESAI (Read-Only) dan saya tetap ingin menghapusnya secara permanen dari server dan Google Drive.
+                </label>
+              </div>
+            )}
+
             {deleteModal.errorMessage && (
               <div className="bg-red-50 border border-red-100 text-red-700 p-2.5 rounded-lg text-xs font-semibold">
                 {deleteModal.errorMessage}
@@ -722,9 +736,13 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
               <button
                 type="button"
                 onClick={executeDelete}
-                disabled={isDeleting}
+                disabled={isDeleting || (!!deleteModal.isCompletedWarning && !confirmBypassChecked)}
                 id="btn-confirm-delete"
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
+                className={`px-4 py-2 text-white rounded-lg text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-xs ${
+                  (!!deleteModal.isCompletedWarning && !confirmBypassChecked) 
+                    ? "bg-red-400 cursor-not-allowed opacity-60" 
+                    : "bg-red-600 hover:bg-red-700"
+                }`}
               >
                 {isDeleting ? (
                   <>
