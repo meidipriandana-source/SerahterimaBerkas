@@ -10,9 +10,15 @@ interface HandoverFormProps {
   documents?: DocumentHandover[];
 }
 
+const HARDCODED_SUPERVISORS = [
+  { name: "dr. Budy Azis B, Sp.PK.,M.H.", email: "budy.azis@company.com" },
+  { name: "Aripuddin Maskur, S.E.,M.M", email: "aripuddin.maskur@company.com" }
+];
+
 export default function HandoverForm({ onSuccessSubmit, triggerPushNotification, documents = [] }: HandoverFormProps) {
   // Hardcoded recipient positions
   const recipientPositions = [
+    { name: "AWS Indonesia Sales", email: "sales@aws.co.id" },
     { name: "Sekretaris Direktur", email: "sekretaris.direktur@company.com" },
     { name: "Sekretaris Wadir", email: "sekretaris.wadir@company.com" },
     { name: "Kabag", email: "kabag@company.com" },
@@ -23,22 +29,45 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
 
   // Hardcoded recipient persons
   const recipientPersons = [
+    { name: "AWS Indonesia Sales", email: "sales@aws.co.id" },
     { name: "Aina Mardiana", email: "aina.mardiana@company.com" },
     { name: "Wafiq Khalifatul Azizah, SKM.,M.Kes", email: "wafiq.khalifatul@company.com" }
   ];
 
   // Form fields
-  const [title, setTitle] = useState(() => localStorage.getItem("handover_form_title") || "");
-  const [description, setDescription] = useState(() => localStorage.getItem("handover_form_description") || "");
-  const [category, setCategory] = useState(() => localStorage.getItem("handover_form_category") || "Telaah Diklat/Pelatihan");
-  const [senderName, setSenderName] = useState("Meidi Priandana");
-  const [senderEmail, setSenderEmail] = useState("meidipriandana@gmail.com");
-  const [recipientName, setRecipientName] = useState(() => localStorage.getItem("handover_form_recipientName") || "Sekretaris Direktur");
-  const [recipientPersonName, setRecipientPersonName] = useState(() => localStorage.getItem("handover_form_recipientPersonName") || "Aina Mardiana");
-  const [recipientEmail, setRecipientEmail] = useState(() => localStorage.getItem("handover_form_recipientEmail") || "aina.mardiana@company.com");
-  const [supervisor1, setSupervisor1] = useState(() => localStorage.getItem("handover_form_supervisor1") || "dr. Budy Azis B, Sp.PK.,M.H.");
-  const [supervisor2, setSupervisor2] = useState(() => localStorage.getItem("handover_form_supervisor2") || "");
-  const [supervisor3, setSupervisor3] = useState(() => localStorage.getItem("handover_form_supervisor3") || "");
+  const [title, setTitle] = useState(() => localStorage.getItem("handover_form_title") || "Berkas Kontrak Vendor Cloud AWS");
+  const [description, setDescription] = useState(() => localStorage.getItem("handover_form_description") || "Dokumen fisik kontrak sewa server AWS Enterprise Cloud Tier selama 12 bulan.");
+  const [category, setCategory] = useState(() => localStorage.getItem("handover_form_category") || "Kontrak & Kerjasama");
+  const [senderName, setSenderName] = useState(() => localStorage.getItem("handover_form_senderName") || "Meidi Priandana");
+  const [senderEmail, setSenderEmail] = useState(() => localStorage.getItem("handover_form_senderEmail") || "meidipriandana@gmail.com");
+  const [recipientName, setRecipientName] = useState(() => localStorage.getItem("handover_form_recipientName") || "AWS Indonesia Sales");
+  const [recipientPersonName, setRecipientPersonName] = useState(() => localStorage.getItem("handover_form_recipientPersonName") || "AWS Indonesia Sales");
+  const [recipientEmail, setRecipientEmail] = useState(() => localStorage.getItem("handover_form_recipientEmail") || "sales@aws.co.id");
+  
+  const [supervisor1, setSupervisor1] = useState(() => {
+    const saved = localStorage.getItem("handover_form_supervisor1");
+    if (saved && HARDCODED_SUPERVISORS.some(s => s.name === saved)) {
+      return saved;
+    }
+    return HARDCODED_SUPERVISORS[0].name;
+  });
+  
+  const [supervisor2, setSupervisor2] = useState(() => {
+    const saved = localStorage.getItem("handover_form_supervisor2");
+    if (saved && HARDCODED_SUPERVISORS.some(s => s.name === saved)) {
+      return saved;
+    }
+    return "";
+  });
+  
+  const [supervisor3, setSupervisor3] = useState(() => {
+    const saved = localStorage.getItem("handover_form_supervisor3");
+    if (saved && HARDCODED_SUPERVISORS.some(s => s.name === saved)) {
+      return saved;
+    }
+    return "";
+  });
+  
   const [senderSignature, setSenderSignature] = useState(() => localStorage.getItem("handover_form_senderSignature") || "");
   
   // Dynamic list of items/documents to hand over
@@ -52,6 +81,14 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
     return saved ? JSON.parse(saved) : {};
   });
   
+  useEffect(() => {
+    localStorage.setItem("handover_form_senderName", senderName);
+  }, [senderName]);
+
+  useEffect(() => {
+    localStorage.setItem("handover_form_senderEmail", senderEmail);
+  }, [senderEmail]);
+
   // Auto-save form fields to localStorage
   useEffect(() => {
     localStorage.setItem("handover_form_title", title);
@@ -176,15 +213,11 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
   }, []);
 
   // Hardcoded supervisor list
-  const supervisors = [
-    { name: "dr. Budy Azis B, Sp.PK.,M.H.", email: "budy.azis@company.com" },
-    { name: "Aripuddin Maskur, S.E.,M.M", email: "aripuddin.maskur@company.com" },
-    { name: "Sekretaris Wadir", email: "sekretaris.wadir@company.com" },
-    { name: "Sekretaris Direktur", email: "sekretaris.direktur@company.com" }
-  ];
+  const supervisors = HARDCODED_SUPERVISORS;
 
   // Hardcoded categories
   const categories = [
+    "Kontrak & Kerjasama",
     "Telaah Diklat/Pelatihan",
     "SPJ Diklat",
     "SK (Surat Keputusan)"
@@ -238,8 +271,8 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
       supervisors.find(s => s.name === supervisor3)
     ].filter(Boolean) as { name: string; email: string }[];
 
-    const finalSupervisorName = chosenSups.map(s => s.name).join(", ");
-    const finalSupervisorEmail = chosenSups.map(s => s.email).join(", ");
+    const finalSupervisorName = chosenSups.map(s => s.name).join("; ");
+    const finalSupervisorEmail = chosenSups.map(s => s.email).join("; ");
 
     setIsSubmitting(true);
 
@@ -462,10 +495,10 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                 </label>
                 <input
                   type="text"
-                  disabled
                   value={senderName}
+                  onChange={(e) => setSenderName(e.target.value)}
                   id="form-input-sender-name"
-                  className="w-full text-xs border border-slate-200 bg-slate-100/50 text-slate-500 rounded-md px-2.5 py-1.5"
+                  className="w-full text-xs border border-slate-300 rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 transition"
                 />
               </div>
 
@@ -475,10 +508,10 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                 </label>
                 <input
                   type="email"
-                  disabled
                   value={senderEmail}
+                  onChange={(e) => setSenderEmail(e.target.value)}
                   id="form-input-sender-email"
-                  className="w-full text-xs border border-slate-200 bg-slate-100/50 text-slate-500 rounded-md px-2.5 py-1.5"
+                  className="w-full text-xs border border-slate-300 rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 transition"
                 />
               </div>
             </div>

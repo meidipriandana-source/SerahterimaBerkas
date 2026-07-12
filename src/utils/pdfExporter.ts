@@ -172,8 +172,8 @@ export async function exportDocumentToPDF(doc: DocumentHandover): Promise<void> 
       <div style="margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; text-align: center;">
         <div style="border-top: 1px dashed #cbd5e1; padding-top: 15px; background: #fafafa; border-radius: 8px; padding: 12px;">
           <div style="font-size: 8px; font-weight: bold; color: #64748b; text-transform: uppercase; margin-bottom: 10px;">DIREKOMENDASIKAN OLEH</div>
-          ${getSigElement(doc.senderSignature, "Sender", doc.senderName)}
-          <div style="font-size: 11px; font-weight: bold; color: #0f172a;">${doc.senderName}</div>
+          ${getSigElement(doc.senderSignature, "Sender", doc.senderName === "Budi Santoso" ? "Budi Santoso, untuk pihak pertama Meidi Priandana" : doc.senderName)}
+          <div style="font-size: 11px; font-weight: bold; color: #0f172a;">${doc.senderName === "Budi Santoso" ? "Budi Santoso, untuk pihak pertama Meidi Priandana" : doc.senderName}</div>
           <div style="font-size: 9px; color: #64748b; margin-top: 2px;">Pihak Pertama (Pengaju)</div>
         </div>
 
@@ -185,7 +185,7 @@ export async function exportDocumentToPDF(doc: DocumentHandover): Promise<void> 
         </div>
 
         ${(() => {
-          const sups = doc.supervisorName ? doc.supervisorName.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
+          const sups = doc.supervisorName ? doc.supervisorName.split(";").map((s: string) => s.trim()).filter(Boolean) : [];
           return sups.map((supName: string) => {
             const sig = doc.supervisorSignatures?.[supName] || (sups.length === 1 ? doc.supervisorSignature : null);
             return `
@@ -458,8 +458,8 @@ export function generateDocumentHTML(doc: DocumentHandover): string {
         <div style="margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; text-align: center;">
           <div style="border-top: 1px dashed #cbd5e1; padding-top: 15px; background: #fafafa; border-radius: 8px; padding: 12px;">
             <div style="font-size: 8px; font-weight: bold; color: #64748b; text-transform: uppercase; margin-bottom: 10px;">DIREKOMENDASIKAN OLEH</div>
-            ${getSigElement(doc.senderSignature, "Sender", doc.senderName)}
-            <div style="font-size: 11px; font-weight: bold; color: #0f172a;">${doc.senderName}</div>
+            ${getSigElement(doc.senderSignature, "Sender", doc.senderName === "Budi Santoso" ? "Budi Santoso, untuk pihak pertama Meidi Priandana" : doc.senderName)}
+            <div style="font-size: 11px; font-weight: bold; color: #0f172a;">${doc.senderName === "Budi Santoso" ? "Budi Santoso, untuk pihak pertama Meidi Priandana" : doc.senderName}</div>
             <div style="font-size: 9px; color: #64748b; margin-top: 2px;">Pihak Pertama (Pengaju)</div>
           </div>
 
@@ -471,7 +471,7 @@ export function generateDocumentHTML(doc: DocumentHandover): string {
           </div>
 
           ${(() => {
-            const sups = doc.supervisorName ? doc.supervisorName.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
+            const sups = doc.supervisorName ? doc.supervisorName.split(";").map((s: string) => s.trim()).filter(Boolean) : [];
             return sups.map((supName: string) => {
               const sig = doc.supervisorSignatures?.[supName] || (sups.length === 1 ? doc.supervisorSignature : null);
               return `

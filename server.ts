@@ -44,14 +44,15 @@ function seedDbIfEmpty(db: any) {
       description: "Serah terima unit laptop kerja Macbook Pro M3, charger 96W, dan USB-C cable untuk Senior FE Developer.",
       category: "Inventaris Kantor",
       timestamp: new Date(Date.now() - 3 * 3600 * 1000 * 24).toISOString(), // 3 days ago
-      senderName: "Budi Santoso",
-      senderEmail: "budi.santoso@company.com",
+      senderName: "Meidi Priandana",
+      senderEmail: "meidipriandana@gmail.com",
       senderSignature: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='50'><path d='M10,25 Q30,10 50,25 T90,25' stroke='black' stroke-width='2' fill='none'/></svg>",
-      recipientName: "Meidi Priandana",
-      recipientEmail: "meidipriandana@gmail.com",
-      supervisorName: "Hendra Wijaya (CTO)",
-      supervisorEmail: "hendra.wijaya@company.com",
+      recipientName: "Aina Mardiana (Sekretaris Direktur)",
+      recipientEmail: "aina.mardiana@company.com",
+      supervisorName: "dr. Budy Azis B, Sp.PK.,M.H.",
+      supervisorEmail: "budy.azis@company.com",
       supervisorSignature: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='50'><path d='M10,20 Q40,30 50,10 T90,30' stroke='black' stroke-width='2' fill='none'/></svg>",
+      supervisorSignatures: { "dr. Budy Azis B, Sp.PK.,M.H.": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='50'><path d='M10,20 Q40,30 50,10 T90,30' stroke='black' stroke-width='2' fill='none'/></svg>" },
       adminSignature: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='50'><path d='M10,30 C30,10 70,40 90,20' stroke='darkblue' stroke-width='2' fill='none'/></svg>",
       status: "completed",
       verificationCode: "ST-88C9-D3E4",
@@ -67,14 +68,15 @@ function seedDbIfEmpty(db: any) {
       description: "Dokumen fisik kontrak sewa server AWS Enterprise Cloud Tier selama 12 bulan.",
       category: "Kontrak & Kerjasama",
       timestamp: new Date(Date.now() - 2 * 3600 * 1000).toISOString(), // 2 hours ago
-      senderName: "Budi Santoso",
-      senderEmail: "budi.santoso@company.com",
+      senderName: "Meidi Priandana",
+      senderEmail: "meidipriandana@gmail.com",
       senderSignature: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='50'><path d='M10,25 Q30,10 50,25 T90,25' stroke='black' stroke-width='2' fill='none'/></svg>",
       recipientName: "AWS Indonesia Sales",
       recipientEmail: "sales@aws.co.id",
-      supervisorName: "Hendra Wijaya (CTO)",
-      supervisorEmail: "hendra.wijaya@company.com",
+      supervisorName: "Aripuddin Maskur, S.E.,M.M",
+      supervisorEmail: "aripuddin.maskur@company.com",
       supervisorSignature: null,
+      supervisorSignatures: { "Aripuddin Maskur, S.E.,M.M": null },
       adminSignature: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='50'><path d='M10,30 C30,10 70,40 90,20' stroke='darkblue' stroke-width='2' fill='none'/></svg>",
       status: "pending_atasan",
       verificationCode: "ST-AF31-889B",
@@ -90,13 +92,13 @@ function seedDbIfEmpty(db: any) {
       description: "Laporan neraca keuangan, rugi laba, dan bukti transaksi triwulan kedua yang telah diaudit.",
       category: "Laporan Keuangan",
       timestamp: new Date(Date.now() - 20 * 60 * 1000).toISOString(), // 20 mins ago
-      senderName: "Dewi Lestari",
-      senderEmail: "dewi.lestari@company.com",
+      senderName: "Meidi Priandana",
+      senderEmail: "meidipriandana@gmail.com",
       senderSignature: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='50'><path d='M15,35 Q35,5 55,35 T95,15' stroke='black' stroke-width='2' fill='none'/></svg>",
-      recipientName: "Internal Audit Committee",
-      recipientEmail: "audit@company.com",
-      supervisorName: "Ratna Sari (Finance Director)",
-      supervisorEmail: "ratna.sari@company.com",
+      recipientName: "Aina Mardiana (Sekretaris Direktur)",
+      recipientEmail: "aina.mardiana@company.com",
+      supervisorName: "Aripuddin Maskur, S.E.,M.M",
+      supervisorEmail: "aripuddin.maskur@company.com",
       supervisorSignature: null,
       adminSignature: null,
       status: "pending_admin",
@@ -115,7 +117,7 @@ function seedDbIfEmpty(db: any) {
         timestamp: new Date(Date.now() - 3 * 3600 * 1000 * 24).toISOString(),
         documentId: "doc-101",
         documentTitle: "Laptop Macbook Pro M3 Staff IT",
-        actor: "Budi Santoso",
+        actor: "Meidi Priandana",
         role: "staff",
         action: "Pengajuan Serah Terima",
         details: "Mengajukan serah terima unit Macbook Pro M3"
@@ -128,24 +130,24 @@ function seedDbIfEmpty(db: any) {
         actor: "Sistem Admin",
         role: "admin",
         action: "Verifikasi & Tanda Tangan",
-        details: "Admin menyetujui, menandatangani berkas, dan meneruskan ke Atasan: Hendra Wijaya (CTO)"
+        details: "Admin menyetujui, menandatangani berkas, dan meneruskan ke Atasan: dr. Budy Azis B, Sp.PK.,M.H."
       },
       {
         id: "log-3",
         timestamp: new Date(Date.now() - 3 * 3600 * 1000 * 24 + 35 * 60 * 1000).toISOString(),
         documentId: "doc-101",
         documentTitle: "Laptop Macbook Pro M3 Staff IT",
-        actor: "Hendra Wijaya (CTO)",
+        actor: "dr. Budy Azis B, Sp.PK.,M.H.",
         role: "atasan",
         action: "Persetujuan Akhir (Signed)",
-        details: "Atasan menandatangani berkas secara digital. Status berkas SELURUHNYA SELESAI. PDF disimpan ke Drive dan notifikasi email dikirim ke meidipriandana@gmail.com."
+        details: "Atasan menandatangani berkas secara digital. Status berkas SELURUHNYA SELESAI. PDF disimpan ke Drive dan notifikasi email dikirim ke aina.mardiana@company.com."
       },
       {
         id: "log-4",
         timestamp: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
         documentId: "doc-102",
         documentTitle: "Berkas Kontrak Vendor AWS",
-        actor: "Budi Santoso",
+        actor: "Meidi Priandana",
         role: "staff",
         action: "Pengajuan Serah Terima",
         details: "Mengajukan berkas kontrak vendor AWS"
@@ -158,14 +160,14 @@ function seedDbIfEmpty(db: any) {
         actor: "Sistem Admin",
         role: "admin",
         action: "Verifikasi & Tanda Tangan",
-        details: "Admin menandatangani berkas kontrak dan memproses alur ke atasan Hendra Wijaya (CTO)"
+        details: "Admin menandatangani berkas kontrak dan memproses alur ke atasan Aripuddin Maskur, S.E.,M.M"
       },
       {
         id: "log-6",
         timestamp: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
         documentId: "doc-103",
         documentTitle: "Laporan Keuangan Audit Q2 2026",
-        actor: "Dewi Lestari",
+        actor: "Meidi Priandana",
         role: "staff",
         action: "Pengajuan Serah Terima",
         details: "Mengajukan berkas laporan keuangan Q2"
@@ -177,7 +179,7 @@ function seedDbIfEmpty(db: any) {
         id: "notif-1",
         timestamp: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
         title: "Dokumen Baru Masuk",
-        message: "Dokumen 'Laporan Keuangan Audit Q2 2026' dikirim oleh Dewi Lestari menunggu verifikasi Anda.",
+        message: "Dokumen 'Laporan Keuangan Audit Q2 2026' dikirim oleh Meidi Priandana menunggu verifikasi Anda.",
         documentId: "doc-103",
         read: false
       },
@@ -185,7 +187,7 @@ function seedDbIfEmpty(db: any) {
         id: "notif-2",
         timestamp: new Date(Date.now() - 1.8 * 3600 * 1000).toISOString(),
         title: "Pemberitahuan Approval",
-        message: "Dokumen AWS Kontrak telah ditandatangani Admin dan diteruskan ke Atasan Hendra Wijaya.",
+        message: "Dokumen AWS Kontrak telah ditandatangani Admin dan diteruskan ke Atasan Aripuddin Maskur, S.E.,M.M.",
         documentId: "doc-102",
         read: false
       }
@@ -849,7 +851,7 @@ async function startServer() {
           <div class="sig-block">
             <div class="sig-title">DIREKOMENDASIKAN OLEH (STAFF)</div>
             <img class="sig-image" src="${doc.senderSignature}" alt="Tanda Tangan Pengaju">
-            <div class="sig-name"><strong>${doc.senderName}</strong></div>
+            <div class="sig-name"><strong>${doc.senderName === "Budi Santoso" ? "Budi Santoso, untuk pihak pertama Meidi Priandana" : doc.senderName}</strong></div>
             <div style="font-size: 11px; color: #718096;">Pihak Pertama (Pengaju)</div>
           </div>
           
@@ -901,6 +903,54 @@ async function startServer() {
     </html>
     `;
     res.send(html);
+  });
+
+  // Update/Edit a single document
+  app.put("/api/documents/:id", (req, res) => {
+    const { id } = req.params;
+    const { title, description, category, senderName, senderEmail, recipientName, recipientEmail, supervisorName, supervisorEmail, items } = req.body;
+    
+    const database = loadDb();
+    const docIdx = database.documents.findIndex((d: any) => d.id === id);
+    if (docIdx !== -1) {
+      const doc = database.documents[docIdx];
+      
+      if (title !== undefined) doc.title = title;
+      if (description !== undefined) doc.description = description;
+      if (category !== undefined) doc.category = category;
+      if (senderName !== undefined) doc.senderName = senderName;
+      if (senderEmail !== undefined) doc.senderEmail = senderEmail;
+      if (recipientName !== undefined) doc.recipientName = recipientName;
+      if (recipientEmail !== undefined) doc.recipientEmail = recipientEmail;
+      if (supervisorName !== undefined) {
+        doc.supervisorName = supervisorName;
+        const individualSupervisors = supervisorName.split(",").map((s: string) => s.trim()).filter(Boolean);
+        const supervisorSignatures: Record<string, string | null> = {};
+        individualSupervisors.forEach((sup: string) => {
+          supervisorSignatures[sup] = doc.supervisorSignatures?.[sup] || null;
+        });
+        doc.supervisorSignatures = supervisorSignatures;
+      }
+      if (supervisorEmail !== undefined) doc.supervisorEmail = supervisorEmail;
+      if (items !== undefined) doc.items = items;
+
+      // Log update
+      const newLog: ActivityLog = {
+        id: "log-" + Date.now(),
+        timestamp: new Date().toISOString(),
+        documentId: id,
+        documentTitle: doc.title,
+        actor: "Sistem Admin",
+        role: "admin",
+        action: "Pembaruan Dokumen",
+        details: `Dokumen '${doc.title}' berhasil diperbarui oleh Admin.`
+      };
+      database.logs.unshift(newLog);
+      
+      saveDb(database);
+      return res.json(doc);
+    }
+    res.status(404).json({ error: "Document not found" });
   });
 
   // Delete a single document

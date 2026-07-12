@@ -190,7 +190,9 @@ export default function VerificationPanel({ documents }: VerificationPanelProps)
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="bg-white border border-slate-200 rounded-lg p-3 text-center">
                     <div className="text-[9px] font-bold text-slate-400 uppercase">Pihak Pertama (Staff)</div>
-                    <div className="font-bold text-slate-700 text-xs mt-1">{result.senderName}</div>
+                    <div className="font-bold text-slate-700 text-xs mt-1">
+                      {result.senderName === "Budi Santoso" ? "Budi Santoso, untuk pihak pertama Meidi Priandana" : result.senderName}
+                    </div>
                     <span className="text-[9px] text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-100 mt-1.5 inline-block">TERVERIFIKASI</span>
                   </div>
 

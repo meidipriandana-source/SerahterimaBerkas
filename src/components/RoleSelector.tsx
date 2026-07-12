@@ -31,7 +31,7 @@ export default function RoleSelector({ currentRole, onRoleChange }: RoleSelector
       icon: UserCheck,
       color: "border-emerald-500 bg-emerald-50 text-emerald-700",
       activeColor: "ring-2 ring-emerald-500 bg-emerald-600 text-white border-emerald-600",
-      desc: "Meninjau pengajuan berkas, menandatangani persetujuan akhir (sebagai Sekretaris Wadir / Sekretaris Direktur), & menyelesaikan alur kerja."
+      desc: "Meninjau pengajuan berkas, menandatangani persetujuan akhir (sebagai dr. Budy Azis B, Sp.PK.,M.H. / Aripuddin Maskur, S.E.,M.M), & menyelesaikan alur kerja."
     }
   ];
 

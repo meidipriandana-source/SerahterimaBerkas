@@ -8,11 +8,11 @@ function getSeedData() {
     description: "Serah terima unit laptop kerja Macbook Pro M3, charger 96W, dan USB-C cable untuk Senior FE Developer.",
     category: "Inventaris Kantor",
     timestamp: new Date(Date.now() - 3 * 3600 * 1000 * 24).toISOString(), // 3 days ago
-    senderName: "Budi Santoso",
-    senderEmail: "budi.santoso@company.com",
+    senderName: "Meidi Priandana",
+    senderEmail: "meidipriandana@gmail.com",
     senderSignature: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='50'><path d='M10,25 Q30,10 50,25 T90,25' stroke='black' stroke-width='2' fill='none'/></svg>",
-    recipientName: "Meidi Priandana",
-    recipientEmail: "meidipriandana@gmail.com",
+    recipientName: "Aina Mardiana (Sekretaris Direktur)",
+    recipientEmail: "aina.mardiana@company.com",
     supervisorName: "dr. Budy Azis B, Sp.PK.,M.H.",
     supervisorEmail: "budy.azis@company.com",
     supervisorSignature: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='50'><path d='M10,20 Q40,30 50,10 T90,30' stroke='black' stroke-width='2' fill='none'/></svg>",
@@ -31,8 +31,8 @@ function getSeedData() {
     description: "Dokumen fisik kontrak sewa server AWS Enterprise Cloud Tier selama 12 bulan.",
     category: "Kontrak & Kerjasama",
     timestamp: new Date(Date.now() - 2 * 3600 * 1000).toISOString(), // 2 hours ago
-    senderName: "Budi Santoso",
-    senderEmail: "budi.santoso@company.com",
+    senderName: "Meidi Priandana",
+    senderEmail: "meidipriandana@gmail.com",
     senderSignature: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='50'><path d='M10,25 Q30,10 50,25 T90,25' stroke='black' stroke-width='2' fill='none'/></svg>",
     recipientName: "AWS Indonesia Sales",
     recipientEmail: "sales@aws.co.id",
@@ -54,11 +54,11 @@ function getSeedData() {
     description: "Laporan neraca keuangan, rugi laba, dan bukti transaksi triwulan kedua yang telah diaudit.",
     category: "Laporan Keuangan",
     timestamp: new Date(Date.now() - 20 * 60 * 1000).toISOString(), // 20 mins ago
-    senderName: "Dewi Lestari",
-    senderEmail: "dewi.lestari@company.com",
+    senderName: "Meidi Priandana",
+    senderEmail: "meidipriandana@gmail.com",
     senderSignature: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='50'><path d='M15,35 Q35,5 55,35 T95,15' stroke='black' stroke-width='2' fill='none'/></svg>",
-    recipientName: "Internal Audit Committee",
-    recipientEmail: "audit@company.com",
+    recipientName: "Aina Mardiana (Sekretaris Direktur)",
+    recipientEmail: "aina.mardiana@company.com",
     supervisorName: "dr. Budy Azis B, Sp.PK.,M.H.",
     supervisorEmail: "budy.azis@company.com",
     supervisorSignature: null,
@@ -79,7 +79,7 @@ function getSeedData() {
         timestamp: new Date(Date.now() - 3 * 3600 * 1000 * 24).toISOString(),
         documentId: "doc-101",
         documentTitle: "Laptop Macbook Pro M3 Staff IT",
-        actor: "Budi Santoso",
+        actor: "Meidi Priandana",
         role: "staff" as const,
         action: "Pengajuan Serah Terima",
         details: "Mengajukan serah terima unit Macbook Pro M3"
@@ -102,14 +102,14 @@ function getSeedData() {
         actor: "dr. Budy Azis B, Sp.PK.,M.H.",
         role: "atasan" as const,
         action: "Persetujuan Akhir (Signed)",
-        details: "Atasan menandatangani berkas secara digital. Status berkas SELURUHNYA SELESAI. PDF disimpan ke Drive dan notifikasi email dikirim ke meidipriandana@gmail.com."
+        details: "Atasan menandatangani berkas secara digital. Status berkas SELURUHNYA SELESAI. PDF disimpan ke Drive dan notifikasi email dikirim ke aina.mardiana@company.com."
       },
       {
         id: "log-4",
         timestamp: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
         documentId: "doc-102",
         documentTitle: "Berkas Kontrak Vendor AWS",
-        actor: "Budi Santoso",
+        actor: "Meidi Priandana",
         role: "staff" as const,
         action: "Pengajuan Serah Terima",
         details: "Mengajukan berkas kontrak vendor AWS"
@@ -129,7 +129,7 @@ function getSeedData() {
         timestamp: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
         documentId: "doc-103",
         documentTitle: "Laporan Keuangan Audit Q2 2026",
-        actor: "Dewi Lestari",
+        actor: "Meidi Priandana",
         role: "staff" as const,
         action: "Pengajuan Serah Terima",
         details: "Mengajukan berkas laporan keuangan Q2"
@@ -140,7 +140,7 @@ function getSeedData() {
         id: "notif-1",
         timestamp: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
         title: "Dokumen Baru Masuk",
-        message: "Dokumen 'Laporan Keuangan Audit Q2 2026' dikirim oleh Dewi Lestari menunggu verifikasi Anda.",
+        message: "Dokumen 'Laporan Keuangan Audit Q2 2026' dikirim oleh Meidi Priandana menunggu verifikasi Anda.",
         documentId: "doc-103",
         read: false
       },
@@ -170,10 +170,39 @@ function getLocalDB() {
     return seed;
   }
 
+  let documents = JSON.parse(docsRaw) as DocumentHandover[];
+  const logs = JSON.parse(logsRaw) as ActivityLog[];
+  const notifications = JSON.parse(notifsRaw) as PushNotification[];
+
+  let modified = false;
+  documents = documents.map(doc => {
+    const parts = doc.supervisorName.split(";").map(s => s.trim()).filter(Boolean);
+    const validParts = parts.map(name => {
+      if (name.includes("Hendra") || name.includes("CTO") || name.includes("Budi Santoso") || (!name.includes("Budy Azis") && !name.includes("Aripuddin"))) {
+        return "dr. Budy Azis B, Sp.PK.,M.H.";
+      }
+      return name;
+    });
+    const newSupName = validParts.join("; ");
+    if (newSupName !== doc.supervisorName) {
+      modified = true;
+      return {
+        ...doc,
+        supervisorName: newSupName,
+        supervisorEmail: doc.supervisorEmail ? doc.supervisorEmail.replace("hendra", "budy.azis") : "budy.azis@company.com"
+      };
+    }
+    return doc;
+  });
+
+  if (modified) {
+    localStorage.setItem("client_db_documents", JSON.stringify(documents));
+  }
+
   return {
-    documents: JSON.parse(docsRaw) as DocumentHandover[],
-    logs: JSON.parse(logsRaw) as ActivityLog[],
-    notifications: JSON.parse(notifsRaw) as PushNotification[]
+    documents,
+    logs,
+    notifications
   };
 }
 
@@ -285,7 +314,7 @@ export function setupFetchInterceptor() {
           const randomHex2 = Math.random().toString(16).substring(2, 6).toUpperCase();
           const verificationCode = `ST-${randomHex}-${randomHex2}`;
 
-          const individualSupervisors = supervisorName ? supervisorName.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
+          const individualSupervisors = supervisorName ? supervisorName.split(";").map((s: string) => s.trim()).filter(Boolean) : [];
           const supervisorSignatures: Record<string, string | null> = {};
           individualSupervisors.forEach((sup: string) => {
             supervisorSignatures[sup] = null;
@@ -411,7 +440,12 @@ export function setupFetchInterceptor() {
           doc.supervisorSignatures[activeSup] = body.supervisorSignature;
           doc.supervisorSignature = body.supervisorSignature; // backcompat
 
-          const allSups = doc.supervisorName.split(",").map((s) => s.trim()).filter(Boolean);
+          const allSups = doc.supervisorName.split(";").map((s) => s.trim()).filter(Boolean);
+          if (!allSups.includes(activeSup)) {
+            allSups.push(activeSup);
+            doc.supervisorName = allSups.join("; ");
+          }
+          
           const remainingUnsigned = allSups.filter((s) => !doc.supervisorSignatures?.[s]);
 
           const isFullySigned = remainingUnsigned.length === 0;
@@ -489,6 +523,58 @@ export function setupFetchInterceptor() {
           db.documents[docIdx] = doc;
           saveLocalDB(db);
           responseData = doc;
+        } else {
+          status = 404;
+          responseData = { error: "Document not found" };
+        }
+      }
+      // 12.5. PUT /api/documents/:id
+      else if (pathname.startsWith("/api/documents/") && method === "PUT") {
+        const id = pathname.split("/")[3];
+        const docIdx = db.documents.findIndex((d) => d.id === id);
+
+        if (docIdx !== -1) {
+          try {
+            const body = JSON.parse(init?.body as string);
+            const doc = db.documents[docIdx];
+            
+            if (body.title !== undefined) doc.title = body.title;
+            if (body.description !== undefined) doc.description = body.description;
+            if (body.category !== undefined) doc.category = body.category;
+            if (body.senderName !== undefined) doc.senderName = body.senderName;
+            if (body.senderEmail !== undefined) doc.senderEmail = body.senderEmail;
+            if (body.recipientName !== undefined) doc.recipientName = body.recipientName;
+            if (body.recipientEmail !== undefined) doc.recipientEmail = body.recipientEmail;
+            if (body.supervisorName !== undefined) {
+              doc.supervisorName = body.supervisorName;
+              const individualSupervisors = body.supervisorName.split(",").map((s: string) => s.trim()).filter(Boolean);
+              const supervisorSignatures: Record<string, string | null> = {};
+              individualSupervisors.forEach((sup: string) => {
+                supervisorSignatures[sup] = doc.supervisorSignatures?.[sup] || null;
+              });
+              doc.supervisorSignatures = supervisorSignatures;
+            }
+            if (body.supervisorEmail !== undefined) doc.supervisorEmail = body.supervisorEmail;
+            if (body.items !== undefined) doc.items = body.items;
+
+            db.logs.unshift({
+              id: "log-" + Date.now(),
+              timestamp: new Date().toISOString(),
+              documentId: id,
+              documentTitle: doc.title,
+              actor: "Sistem Admin",
+              role: "admin",
+              action: "Pembaruan Dokumen",
+              details: `Dokumen '${doc.title}' berhasil diperbarui oleh Admin.`
+            });
+
+            db.documents[docIdx] = doc;
+            saveLocalDB(db);
+            responseData = doc;
+          } catch (err: any) {
+            status = 400;
+            responseData = { error: err.message };
+          }
         } else {
           status = 404;
           responseData = { error: "Document not found" };
