@@ -104,6 +104,43 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
   
+  // View mode state ("list" or "table") for displaying documents
+  const [viewMode, setViewMode] = useState<"list" | "table">(() => {
+    return (localStorage.getItem("handover_form_viewMode") as "list" | "table") || "list";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("handover_form_viewMode", viewMode);
+  }, [viewMode]);
+
+  // Helper to parse complex concatenated item label safely
+  const parseItemLabel = (fullLabel: string) => {
+    let titlePart = fullLabel;
+    let categoryPart = "";
+    let descPart = "";
+
+    // Regex to match "Title [Category] - Description" or "Title [Category]"
+    const categoryMatch = fullLabel.match(/^(.+?)\s*\[([^\]]+)\](?:\s*-\s*(.*))?$/);
+    if (categoryMatch) {
+      titlePart = categoryMatch[1].trim();
+      categoryPart = categoryMatch[2].trim();
+      descPart = categoryMatch[3] ? categoryMatch[3].trim() : "";
+    } else {
+      // Fallback regex if there is no category but description starts with " - "
+      const descIndex = fullLabel.indexOf(" - ");
+      if (descIndex !== -1) {
+        titlePart = fullLabel.substring(0, descIndex).trim();
+        descPart = fullLabel.substring(descIndex + 3).trim();
+      }
+    }
+
+    return {
+      title: titlePart,
+      category: categoryPart,
+      description: descPart
+    };
+  };
+  
   // Function to explicitly add filled document data to the items list
   const handleAddItem = (e?: React.MouseEvent) => {
     if (e) {
@@ -535,7 +572,7 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
 
             {/* Alur Tanda Tangan Berkas & Waktu Real-time */}
             <div className="md:col-span-2 p-5 bg-indigo-50/45 rounded-xl border border-indigo-100/80 space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-indigo-100/60">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-indigo-100/60">
                 <div className="flex items-center gap-1.5">
                   <div className="p-1 bg-indigo-600 rounded-md text-white">
                     <Clock className="w-3.5 h-3.5 animate-pulse" />
@@ -548,8 +585,26 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                   </div>
                 </div>
                 
+                {/* View Mode Toggle Switcher */}
+                <div className="flex items-center gap-1 bg-indigo-100 p-0.5 rounded-lg border border-indigo-200/40 self-start sm:self-center">
+                  <button
+                    type="button"
+                    onClick={() => setViewMode("list")}
+                    className={`px-2 py-1 text-[9px] font-black uppercase rounded-md transition cursor-pointer ${viewMode === "list" ? "bg-white text-indigo-700 shadow-3xs" : "text-indigo-600/80 hover:text-indigo-800"}`}
+                  >
+                    Rapat/Slim
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setViewMode("table")}
+                    className={`px-2 py-1 text-[9px] font-black uppercase rounded-md transition cursor-pointer ${viewMode === "table" ? "bg-white text-indigo-700 shadow-3xs" : "text-indigo-600/80 hover:text-indigo-800"}`}
+                  >
+                    Tabel (Landscape)
+                  </button>
+                </div>
+
                 {/* Real-time Clock Badge */}
-                <div className="bg-indigo-600 text-white px-3 py-1 rounded-lg flex items-center gap-1.5 shadow-xs">
+                <div className="bg-indigo-600 text-white px-3 py-1 rounded-lg flex items-center gap-1.5 shadow-xs shrink-0 self-start sm:self-center">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping shrink-0" />
                   <span className="text-[10px] font-mono font-bold tracking-wider">
                     {realTime.toLocaleDateString("id-ID", { day: 'numeric', month: 'short' })} &bull; {realTime.toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit', second: '2-digit' })} WIB
@@ -557,19 +612,19 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                 </div>
               </div>
 
-              {/* Timeline sequence based on form items */}
-              <div className="space-y-3.5 relative before:absolute before:bottom-2 before:top-2 before:left-3.5 before:w-0.5 before:bg-indigo-100">
-                {items.length === 0 ? (
-                  <div className="text-center text-slate-400 py-6 text-xs italic">
-                    Belum ada rincian berkas yang dimasukkan di bagian Detail Berkas.
-                  </div>
-                ) : (
-                  items.map((item, idx) => {
-                    // Check if this specific item has been checked as returned
+              {/* View Mode Content Wrapper */}
+              {items.length === 0 ? (
+                <div className="text-center text-slate-400 py-8 text-xs italic">
+                  Belum ada rincian berkas yang dimasukkan di bagian Detail Berkas.
+                </div>
+              ) : viewMode === "list" ? (
+                /* 1. Timeline / List View mode (highly polished & tidied up) */
+                <div className="space-y-4 relative before:absolute before:bottom-2 before:top-2 before:left-3.5 before:w-0.5 before:bg-indigo-100/70">
+                  {items.map((item, idx) => {
+                    const parsed = parseItemLabel(item);
                     const itemState = checkedItems[item] || { returned: false, timestamp: "" };
                     const isChecked = itemState.returned;
 
-                    // Create simulated real-time timestamp for each document (e.g. slight visual spacing offsets)
                     const itemSecondsOffset = idx * 10;
                     const itemTime = new Date(realTime.getTime() + itemSecondsOffset * 1000);
                     const formattedDate = itemTime.toLocaleDateString("id-ID", {
@@ -590,56 +645,70 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                         <div className={`w-7 h-7 rounded-full border-2 border-white text-white flex items-center justify-center font-extrabold shrink-0 text-[10px] shadow-xs transition-colors duration-350 ${isChecked ? 'bg-emerald-600' : 'bg-indigo-600'}`}>
                           {idx + 1}
                         </div>
-                        <div className={`flex-1 min-w-0 p-3.5 rounded-xl border transition-all duration-300 ${isChecked ? 'bg-emerald-50/40 border-emerald-200 shadow-3xs' : 'bg-white border-slate-200/60 shadow-3xs hover:border-indigo-200'}`}>
-                          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-1.5">
-                            {/* Checkbox & Item Title */}
-                            <label className="flex items-start gap-2.5 cursor-pointer select-none group min-w-0 w-full sm:flex-1">
-                              <input
-                                type="checkbox"
-                                checked={isChecked}
-                                onChange={(e) => {
-                                  const checked = e.target.checked;
-                                  if (checked) {
-                                    // Freeze the current exact timestamp
-                                    const now = new Date();
-                                    const freezeDate = now.toLocaleDateString("id-ID", {
-                                      day: "numeric",
-                                      month: "short",
-                                      year: "numeric"
-                                    });
-                                    const freezeTime = now.toLocaleTimeString("id-ID", {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                      second: "2-digit"
-                                    });
-                                    setCheckedItems(prev => ({
-                                      ...prev,
-                                      [item]: {
-                                        returned: true,
-                                        timestamp: `${freezeDate}, ${freezeTime} WIB`
-                                      }
-                                    }));
-                                  } else {
-                                    // Resume real-time clock
-                                    setCheckedItems(prev => ({
-                                      ...prev,
-                                      [item]: {
-                                        returned: false,
-                                        timestamp: ""
-                                      }
-                                    }));
-                                  }
-                                }}
-                                className="mt-0.5 w-4.5 h-4.5 rounded-md text-emerald-600 bg-slate-50 border-slate-300 focus:ring-emerald-500 cursor-pointer accent-emerald-600 shrink-0 transition"
-                              />
-                              {editingIdx === idx ? (
+                        <div className={`flex-1 min-w-0 p-4 rounded-xl border transition-all duration-300 ${isChecked ? 'bg-emerald-50/40 border-emerald-200 shadow-3xs' : 'bg-white border-slate-200/60 shadow-3xs hover:border-indigo-200'}`}>
+                          
+                          {/* Top row: Checkbox, parsed title and badges/actions */}
+                          <div className="flex flex-col gap-3">
+                            <div className="flex items-start justify-between gap-3">
+                              <label className="flex items-start gap-2.5 cursor-pointer select-none group min-w-0 flex-1">
                                 <input
-                                  type="text"
-                                  value={editValue}
-                                  onChange={(e) => setEditValue(e.target.value)}
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                      e.preventDefault();
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  onChange={(e) => {
+                                    const checked = e.target.checked;
+                                    if (checked) {
+                                      const now = new Date();
+                                      const freezeDate = now.toLocaleDateString("id-ID", {
+                                        day: "numeric",
+                                        month: "short",
+                                        year: "numeric"
+                                      });
+                                      const freezeTime = now.toLocaleTimeString("id-ID", {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                        second: "2-digit"
+                                      });
+                                      setCheckedItems(prev => ({
+                                        ...prev,
+                                        [item]: {
+                                          returned: true,
+                                          timestamp: `${freezeDate}, ${freezeTime} WIB`
+                                        }
+                                      }));
+                                    } else {
+                                      setCheckedItems(prev => ({
+                                        ...prev,
+                                        [item]: {
+                                          returned: false,
+                                          timestamp: ""
+                                        }
+                                      }));
+                                    }
+                                  }}
+                                  className="mt-0.5 w-4.5 h-4.5 rounded text-emerald-600 bg-slate-50 border-slate-300 focus:ring-emerald-500 cursor-pointer accent-emerald-600 shrink-0 transition"
+                                />
+                                {editingIdx === idx ? (
+                                  <input
+                                    type="text"
+                                    value={editValue}
+                                    onChange={(e) => setEditValue(e.target.value)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter") {
+                                        e.preventDefault();
+                                        if (editValue.trim()) {
+                                          const updated = [...items];
+                                          updated[idx] = editValue.trim();
+                                          setItems(updated);
+                                          if (idx === 0) {
+                                            setTitle(editValue.trim());
+                                          }
+                                          setEditingIdx(null);
+                                        }
+                                      } else if (e.key === "Escape") {
+                                        setEditingIdx(null);
+                                      }
+                                    }}
+                                    onBlur={() => {
                                       if (editValue.trim()) {
                                         const updated = [...items];
                                         updated[idx] = editValue.trim();
@@ -647,156 +716,310 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                                         if (idx === 0) {
                                           setTitle(editValue.trim());
                                         }
-                                        setEditingIdx(null);
                                       }
-                                    } else if (e.key === "Escape") {
                                       setEditingIdx(null);
-                                    }
-                                  }}
-                                  onBlur={() => {
-                                    if (editValue.trim()) {
-                                      const updated = [...items];
-                                      updated[idx] = editValue.trim();
-                                      setItems(updated);
-                                      if (idx === 0) {
-                                        setTitle(editValue.trim());
-                                      }
-                                    }
-                                    setEditingIdx(null);
-                                  }}
-                                  className="px-1.5 py-0.5 text-xs border border-indigo-300 rounded bg-white text-slate-800 font-bold focus:outline-hidden focus:ring-1 focus:ring-indigo-500 w-full"
-                                  autoFocus
+                                    }}
+                                    className="px-1.5 py-0.5 text-xs border border-indigo-300 rounded bg-white text-slate-800 font-bold focus:outline-hidden focus:ring-1 focus:ring-indigo-500 w-full"
+                                    autoFocus
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                    }}
+                                  />
+                                ) : (
+                                  <div className="space-y-1 min-w-0 flex-1">
+                                    <span className={`font-black text-xs leading-normal transition-all duration-350 block break-words text-slate-850 group-hover:text-indigo-900 ${isChecked ? 'text-emerald-800 line-through decoration-emerald-500 decoration-2' : ''}`}>
+                                      {parsed.title}
+                                    </span>
+                                    {parsed.category && (
+                                      <span className="inline-block text-[8px] font-black bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded uppercase tracking-wider border border-indigo-100/50">
+                                        Kategori: {parsed.category}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                              </label>
+
+                              {/* Action Buttons & Badges */}
+                              <div className="flex items-center gap-1 shrink-0 bg-slate-50 p-1 rounded-lg border border-slate-100">
+                                <button
+                                  type="button"
                                   onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
+                                    setEditingIdx(idx);
+                                    setEditValue(item);
                                   }}
-                                />
-                              ) : (
-                                <span className={`font-extrabold text-xs leading-relaxed transition-all duration-350 break-words ${isChecked ? 'text-emerald-800 line-through decoration-emerald-500 decoration-2' : 'text-slate-800 group-hover:text-indigo-900'}`}>
-                                  {item}
-                                </span>
-                              )}
-                            </label>
-
-                            <div className="flex flex-row items-center sm:flex-col sm:items-end justify-between sm:justify-start gap-2 sm:gap-1.5 shrink-0 w-full sm:w-auto pt-2.5 sm:pt-0 mt-1.5 sm:mt-0 border-t border-dashed border-slate-100 sm:border-t-0">
-                              <div className="flex items-center gap-1.5">
-                                <span className={`text-[8px] font-extrabold px-1.5 py-0.5 rounded-full uppercase shrink-0 transition-colors ${isChecked ? 'bg-emerald-200 text-emerald-900' : 'bg-indigo-100 text-indigo-800'}`}>
-                                  Berkas {idx + 1}
-                                </span>
-                                
-                                <div className="flex items-center gap-0.5">
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      setEditingIdx(idx);
-                                      setEditValue(item);
-                                    }}
-                                    className="p-1 hover:bg-slate-100 rounded text-slate-400 hover:text-indigo-600 transition cursor-pointer"
-                                    title="Edit nama berkas"
-                                  >
-                                    <Pencil className="w-3 h-3" />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      const updated = items.filter((_, i) => i !== idx);
-                                      setItems(updated);
-                                    }}
-                                    className="p-1 hover:bg-slate-100 rounded text-slate-400 hover:text-red-500 transition cursor-pointer"
-                                    title="Hapus berkas"
-                                  >
-                                    <Trash2 className="w-3 h-3" />
-                                  </button>
-                                </div>
+                                  className="p-1 hover:bg-white hover:text-indigo-600 hover:shadow-3xs rounded text-slate-400 transition cursor-pointer"
+                                  title="Edit nama berkas"
+                                >
+                                  <Pencil className="w-3 h-3" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    const updated = items.filter((_, i) => i !== idx);
+                                    setItems(updated);
+                                  }}
+                                  className="p-1 hover:bg-white hover:text-red-500 hover:shadow-3xs rounded text-slate-400 transition cursor-pointer"
+                                  title="Hapus berkas"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </button>
                               </div>
-                              {/* Green badge with checkmark when marked as returned */}
-                              <div className={`flex items-center gap-1 text-[8px] font-bold border px-1.5 py-0.5 rounded shadow-4xs transition-all duration-350 ${isChecked ? 'bg-emerald-100 border-emerald-200 text-emerald-800' : 'bg-slate-50 border-slate-200 text-slate-500'}`} title="Contreng untuk mematikan real-time clock & mengarsipkan">
-                                <CheckCircle2 className={`w-2.5 h-2.5 shrink-0 transition-colors ${isChecked ? 'text-emerald-600' : 'text-slate-400'}`} />
+                            </div>
+
+                            {/* Separated Description/Details block - tidy, slim, spacious */}
+                            {parsed.description && (
+                              <div className="bg-slate-50/70 border border-slate-150 rounded-lg p-2.5 text-[11px] text-slate-600 leading-relaxed font-medium break-words">
+                                <span className="font-extrabold text-[8px] text-slate-400 block uppercase tracking-wider mb-1">Rincian Berkas:</span>
+                                {parsed.description}
+                              </div>
+                            )}
+
+                            {/* Pihak Terkait row */}
+                            <div className="text-[10px] text-slate-500 space-y-1 bg-slate-50/40 p-2.5 rounded-lg border border-slate-100">
+                              <div className="flex items-center gap-2">
+                                <span className="text-[8px] font-black text-indigo-600 bg-indigo-50 border border-indigo-100 px-1.5 py-0.2 rounded uppercase">Pihak I</span>
+                                <span className="font-extrabold text-slate-700">{senderName}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-[8px] font-black text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.2 rounded uppercase">Pihak II</span>
+                                <span className="font-extrabold text-slate-700">{recipientPersonName} <span className="text-slate-400 font-medium">({recipientName})</span></span>
+                              </div>
+                            </div>
+
+                            {/* Live Clock / Frozen Timestamp Badge */}
+                            <div className="flex items-center justify-between gap-2 border-t border-dashed border-slate-100 pt-2.5">
+                              <div className={`flex items-center gap-1 text-[8px] font-bold border px-2 py-0.8 rounded shadow-4xs transition-all duration-350 ${isChecked ? 'bg-emerald-100 border-emerald-200 text-emerald-800' : 'bg-slate-50 border-slate-200 text-slate-500'}`}>
+                                <CheckCircle2 className={`w-3 h-3 shrink-0 ${isChecked ? 'text-emerald-600' : 'text-slate-400'}`} />
                                 <span className="whitespace-nowrap">{isChecked ? 'Kembali & Tersimpan ✔' : 'Belum Kembali'}</span>
                               </div>
-                            </div>
-                          </div>
-                          
-                          <div className="text-[9px] text-slate-500 mt-2 space-y-0.5 font-medium border-t border-slate-100/80 pt-1.5">
-                            <div className="flex items-center gap-1.5">
-                              <span className={`w-1 h-1 rounded-full ${isChecked ? 'bg-emerald-400' : 'bg-slate-400'}`}></span>
-                              <span>Pihak Pertama: <span className="font-bold text-slate-700">{senderName}</span></span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <span className={`w-1 h-1 rounded-full ${isChecked ? 'bg-emerald-400' : 'bg-slate-400'}`}></span>
-                              <span>Pihak Kedua: <span className="font-bold text-slate-700">{recipientPersonName} ({recipientName})</span></span>
-                            </div>
-                          </div>
 
-                          {/* Frozen timestamp if checked, otherwise running clock */}
-                          {isChecked ? (
-                            <div className="text-[9px] text-emerald-700 font-bold mt-2.5 flex items-center gap-1.5 bg-emerald-100/60 px-2.5 py-1.5 rounded-md border border-emerald-200/50 w-fit">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
-                              <span>Berkas Selesai TTD &amp; Kembali:</span>
-                              <span className="font-mono bg-white text-emerald-800 px-1.5 py-0.5 rounded shadow-3xs font-extrabold">
-                                {itemState.timestamp}
-                              </span>
+                              {isChecked ? (
+                                <div className="text-[9px] text-emerald-700 font-bold flex items-center gap-1">
+                                  <span className="font-mono bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-200/50">
+                                    {itemState.timestamp}
+                                  </span>
+                                </div>
+                              ) : (
+                                <div className="text-[9px] text-indigo-600 font-bold flex items-center gap-1">
+                                  <span className="font-mono bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100/30">
+                                    {currentRealTimeStr}
+                                  </span>
+                                </div>
+                              )}
                             </div>
-                          ) : (
-                            <div className="text-[9px] text-indigo-600 font-bold mt-2.5 flex items-center gap-1.5 bg-indigo-50 px-2.5 py-1.5 rounded-md border border-indigo-100/40 w-fit">
-                              <Clock className="w-3 h-3 animate-pulse text-indigo-600 shrink-0" />
-                              <span>Siap di-TTD Real-time:</span>
-                              <span className="font-mono bg-white px-1.5 py-0.5 rounded shadow-3xs font-extrabold text-indigo-700">
-                                {currentRealTimeStr}
-                              </span>
-                            </div>
-                          )}
+                          </div>
                         </div>
                       </div>
                     );
-                  })
-                )}
+                  })}
+                </div>
+              ) : (
+                /* 2. Landscape Table view mode (scrolling table - ideal for widescreen / landscape swipes) */
+                <div className="overflow-x-auto rounded-xl border border-indigo-100/60 bg-white shadow-3xs" id="landscape-table-container">
+                  <table className="min-w-[850px] w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="bg-indigo-50 border-b border-indigo-100/80 text-indigo-950 font-black uppercase text-[10px] tracking-wider">
+                        <th className="py-3 px-3.5 w-12 text-center">No</th>
+                        <th className="py-3 px-3.5 w-2/5">Detail Berkas / Judul &amp; Keterangan</th>
+                        <th className="py-3 px-3.5">Kategori</th>
+                        <th className="py-3 px-3.5">Pihak Terkait</th>
+                        <th className="py-3 px-3.5">Status &amp; Jam Real-time</th>
+                        <th className="py-3 px-3.5 w-24 text-center">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {items.map((item, idx) => {
+                        const parsed = parseItemLabel(item);
+                        const itemState = checkedItems[item] || { returned: false, timestamp: "" };
+                        const isChecked = itemState.returned;
 
-                {/* Inline button to add a new document to the list */}
-                {items.length > 0 && (
-                  <div className="flex justify-end pr-2 pb-1 relative z-10">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const nextNum = items.length + 1;
-                        setItems([...items, `Berkas Tambahan ${nextNum}`]);
-                      }}
-                      className="px-2.5 py-1 text-[10px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-extrabold rounded-lg border border-indigo-200/60 flex items-center gap-1 transition cursor-pointer shadow-3xs"
-                    >
-                      <Plus className="w-3 h-3" /> Tambah Berkas
-                    </button>
-                  </div>
-                )}
+                        const itemSecondsOffset = idx * 10;
+                        const itemTime = new Date(realTime.getTime() + itemSecondsOffset * 1000);
+                        const formattedDate = itemTime.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
+                        const formattedTime = itemTime.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+                        const currentRealTimeStr = `${formattedDate}, ${formattedTime} WIB`;
 
-                {/* Atasan Penyetuju Akhir */}
-                <div className="flex gap-3 text-xs relative z-10 pt-3 border-t border-indigo-100/50">
-                  <div className="w-7 h-7 rounded-full bg-purple-100 border-2 border-white text-purple-700 flex items-center justify-center font-bold shrink-0 text-[10px] shadow-sm">
-                    ★
+                        return (
+                          <tr key={idx} className={`hover:bg-slate-50/50 transition-colors ${isChecked ? 'bg-emerald-50/20' : ''}`}>
+                            {/* No */}
+                            <td className="py-3 px-3.5 font-bold text-slate-600 text-center">
+                              <div className={`w-6 h-6 rounded-full flex items-center justify-center font-extrabold text-[10px] mx-auto text-white ${isChecked ? 'bg-emerald-600' : 'bg-indigo-600'}`}>
+                                {idx + 1}
+                              </div>
+                            </td>
+
+                            {/* Title & Description */}
+                            <td className="py-3 px-3.5 max-w-[320px]">
+                              <div className="space-y-1.5">
+                                <div className="flex items-start gap-2.5">
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={(e) => {
+                                      const checked = e.target.checked;
+                                      if (checked) {
+                                        const now = new Date();
+                                        const freezeDate = now.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
+                                        const freezeTime = now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+                                        setCheckedItems(prev => ({
+                                          ...prev,
+                                          [item]: { returned: true, timestamp: `${freezeDate}, ${freezeTime} WIB` }
+                                        }));
+                                      } else {
+                                        setCheckedItems(prev => ({
+                                          ...prev,
+                                          [item]: { returned: false, timestamp: "" }
+                                        }));
+                                      }
+                                    }}
+                                    className="mt-0.5 w-4 h-4 rounded text-emerald-600 border-slate-300 focus:ring-emerald-500 cursor-pointer"
+                                  />
+                                  {editingIdx === idx ? (
+                                    <input
+                                      type="text"
+                                      value={editValue}
+                                      onChange={(e) => setEditValue(e.target.value)}
+                                      onBlur={() => {
+                                        if (editValue.trim()) {
+                                          const updated = [...items];
+                                          updated[idx] = editValue.trim();
+                                          setItems(updated);
+                                        }
+                                        setEditingIdx(null);
+                                      }}
+                                      onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                          if (editValue.trim()) {
+                                            const updated = [...items];
+                                            updated[idx] = editValue.trim();
+                                            setItems(updated);
+                                          }
+                                          setEditingIdx(null);
+                                        }
+                                      }}
+                                      className="px-1.5 py-0.5 text-xs border border-indigo-300 rounded bg-white font-bold w-full"
+                                      autoFocus
+                                    />
+                                  ) : (
+                                    <span className={`font-black text-xs text-slate-800 leading-normal break-words ${isChecked ? 'line-through text-emerald-800' : ''}`}>
+                                      {parsed.title}
+                                    </span>
+                                  )}
+                                </div>
+                                {parsed.description && (
+                                  <p className="text-[10px] text-slate-500 font-medium pl-6.5 leading-relaxed break-words">
+                                    {parsed.description}
+                                  </p>
+                                )}
+                              </div>
+                            </td>
+
+                            {/* Category */}
+                            <td className="py-3 px-3.5">
+                              <span className="text-[8px] font-black px-2 py-0.5 rounded-full uppercase bg-indigo-50 text-indigo-700 border border-indigo-100/50 whitespace-nowrap">
+                                {parsed.category || "General"}
+                              </span>
+                            </td>
+
+                            {/* Pihak Terkait */}
+                            <td className="py-3 px-3.5 text-[10px] text-slate-600 font-semibold space-y-1 whitespace-nowrap">
+                              <div><span className="text-slate-400 font-bold">Pihak I:</span> {senderName}</div>
+                              <div><span className="text-slate-400 font-bold">Pihak II:</span> {recipientPersonName}</div>
+                            </td>
+
+                            {/* Status & Time */}
+                            <td className="py-3 px-3.5 font-bold">
+                              <div className="space-y-1.5">
+                                <div className={`flex items-center gap-1 text-[8px] border px-1.5 py-0.5 rounded shadow-4xs w-fit ${isChecked ? 'bg-emerald-100 border-emerald-200 text-emerald-800' : 'bg-slate-50 border-slate-200 text-slate-500'}`}>
+                                  <CheckCircle2 className="w-2.5 h-2.5" />
+                                  <span>{isChecked ? 'Kembali ✔' : 'Belum Kembali'}</span>
+                                </div>
+                                <div className="text-[9px] font-mono text-slate-500">
+                                  {isChecked ? itemState.timestamp : currentRealTimeStr}
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* Actions */}
+                            <td className="py-3 px-3.5 text-center">
+                              <div className="flex items-center justify-center gap-1 bg-slate-50 p-1 rounded-lg border border-slate-100 w-fit mx-auto">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditingIdx(idx);
+                                    setEditValue(item);
+                                  }}
+                                  className="p-1 hover:bg-white hover:text-indigo-600 hover:shadow-3xs rounded text-slate-400 transition"
+                                  title="Edit nama berkas"
+                                >
+                                  <Pencil className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const updated = items.filter((_, i) => i !== idx);
+                                    setItems(updated);
+                                  }}
+                                  className="p-1 hover:bg-white hover:text-red-500 hover:shadow-3xs rounded text-slate-400 transition"
+                                  title="Hapus berkas"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* Inline button to add a new document to the list */}
+              {items.length > 0 && (
+                <div className="flex justify-end pr-2 pb-1 relative z-10">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const nextNum = items.length + 1;
+                      setItems([...items, `Berkas Tambahan ${nextNum} [Telaah Diklat/Pelatihan]`]);
+                    }}
+                    className="px-2.5 py-1 text-[10px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-extrabold rounded-lg border border-indigo-200/60 flex items-center gap-1 transition cursor-pointer shadow-3xs"
+                  >
+                    <Plus className="w-3 h-3" /> Tambah Berkas
+                  </button>
+                </div>
+              )}
+
+              {/* Atasan Penyetuju Akhir */}
+              <div className="flex gap-3 text-xs relative z-10 pt-3 border-t border-indigo-100/50">
+                <div className="w-7 h-7 rounded-full bg-purple-100 border-2 border-white text-purple-700 flex items-center justify-center font-bold shrink-0 text-[10px] shadow-sm">
+                  ★
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between gap-1.5 mb-1">
+                    <span className="font-bold text-purple-900">Atasan Penyetuju Akhir</span>
+                    <span className="text-[8px] font-extrabold bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded-full uppercase shrink-0">
+                      Alur Persetujuan TTD
+                    </span>
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between gap-1.5 mb-1">
-                      <span className="font-bold text-purple-900">Atasan Penyetuju Akhir</span>
-                      <span className="text-[8px] font-extrabold bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded-full uppercase shrink-0">
-                        Alur Persetujuan TTD
-                      </span>
-                    </div>
-                    
-                    <div className="space-y-1.5 bg-white p-3 rounded-lg border border-indigo-100/50 shadow-3xs">
-                      {[supervisor1, supervisor2, supervisor3].filter(Boolean).map((name, idx) => (
-                        <div key={idx} className="flex items-center gap-1.5 text-[10px] text-slate-700 font-semibold">
-                          <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
-                          <span>Atasan {idx + 1}: <span className="text-slate-900 font-bold">{name}</span></span>
-                        </div>
-                      ))}
-                    </div>
+                  
+                  <div className="space-y-1.5 bg-white p-3 rounded-lg border border-indigo-100/50 shadow-3xs">
+                    {[supervisor1, supervisor2, supervisor3].filter(Boolean).map((name, idx) => (
+                      <div key={idx} className="flex items-center gap-1.5 text-[10px] text-slate-700 font-semibold">
+                        <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                        <span>Atasan {idx + 1}: <span className="text-slate-900 font-bold">{name}</span></span>
+                      </div>
+                    ))}
                   </div>
                 </div>
-
               </div>
+
             </div>
           </div>
         </div>
