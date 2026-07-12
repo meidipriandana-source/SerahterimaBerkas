@@ -65,8 +65,11 @@ export default function BackupRestorePanel({
     setErrorMsg(null);
     setSuccessMsg(null);
 
-    if (file.type !== "application/json" && !file.name.endsWith(".json")) {
-      setErrorMsg("Berkas harus berformat .json");
+    const isJsonFile = file.name.endsWith(".json") || file.type === "application/json";
+    const isTxtFile = file.name.endsWith(".txt") || file.type === "text/plain";
+
+    if (!isJsonFile && !isTxtFile) {
+      setErrorMsg("Berkas harus berformat .json atau .txt");
       setSelectedFile(null);
       setRestorePreview(null);
       return;
@@ -78,14 +81,32 @@ export default function BackupRestorePanel({
       try {
         const parsed = JSON.parse(e.target?.result as string);
         
-        // Validate expected structure
-        if (!parsed.data || !parsed.data.documents || !parsed.data.logs) {
+        // Validate expected structure - we support both unified formats
+        if (!parsed.data && !parsed.documents) {
           setErrorMsg("Struktur berkas cadangan tidak valid atau usang.");
           setRestorePreview(null);
           return;
         }
 
-        setRestorePreview(parsed);
+        // Normalize format if it was generated directly as raw DB
+        const normalized = parsed.data ? parsed : {
+          version: parsed.version || "1.0",
+          timestamp: parsed.timestamp || new Date().toISOString(),
+          clientConfig: parsed.clientConfig || null,
+          data: {
+            documents: parsed.documents || parsed.data?.documents || [],
+            logs: parsed.logs || parsed.data?.logs || [],
+            notifications: parsed.notifications || parsed.data?.notifications || []
+          }
+        };
+
+        if (!normalized.data.documents && !normalized.data.logs) {
+          setErrorMsg("Struktur berkas cadangan tidak valid atau usang.");
+          setRestorePreview(null);
+          return;
+        }
+
+        setRestorePreview(normalized);
       } catch (err) {
         setErrorMsg("Gagal membaca atau mem-parse isi file JSON.");
         setRestorePreview(null);
@@ -102,23 +123,71 @@ export default function BackupRestorePanel({
 
     try {
       // 1. Get server database state
-      const res = await fetch("/api/backup");
-      if (!res.ok) throw new Error("Gagal mengambil data dari server");
-      const serverPayload = await res.json();
+      let serverPayload: any = { data: null };
+      try {
+        const res = await fetch("/api/backup");
+        if (res.ok) {
+          serverPayload = await res.json();
+        }
+      } catch (err) {
+        console.warn("Could not fetch server backup, will fallback to local storage DB only.");
+      }
 
-      // 2. Add client localstorage configurations if any
-      const driveFolders = localStorage.getItem("drive_custom_folders");
+      // If server backup is unavailable, use client local DB
+      const clientDocs = localStorage.getItem("client_db_documents");
+      const clientLogs = localStorage.getItem("client_db_logs");
+      const clientNotifs = localStorage.getItem("client_db_notifications");
+
+      const documents = serverPayload.data?.documents || (clientDocs ? JSON.parse(clientDocs) : []);
+      const logs = serverPayload.data?.logs || (clientLogs ? JSON.parse(clientLogs) : []);
+      const notifications = serverPayload.data?.notifications || (clientNotifs ? JSON.parse(clientNotifs) : []);
+
+      const backupData = {
+        documents,
+        logs,
+        notifications
+      };
+
+      // 2. Add client localstorage configurations
+      const driveFolders = localStorage.getItem("drive_folders");
+      const driveCustomFolders = localStorage.getItem("drive_custom_folders");
       const driveFileMap = localStorage.getItem("drive_file_folder_map");
+
+      const handoverDrafts: Record<string, string | null> = {};
+      const handoverKeys = [
+        "handover_form_title",
+        "handover_form_description",
+        "handover_form_category",
+        "handover_form_recipientName",
+        "handover_form_recipientPersonName",
+        "handover_form_recipientEmail",
+        "handover_form_supervisor1",
+        "handover_form_supervisor2",
+        "handover_form_supervisor3",
+        "handover_form_senderSignature",
+        "handover_form_items",
+        "handover_form_checkedItems"
+      ];
+      handoverKeys.forEach(key => {
+        handoverDrafts[key] = localStorage.getItem(key);
+      });
 
       // 3. Compose unified backup format
       const fullBackup = {
-        version: "1.0",
+        version: "1.1",
         timestamp: new Date().toISOString(),
         clientConfig: {
-          drive_custom_folders: driveFolders ? JSON.parse(driveFolders) : null,
+          drive_folders: driveFolders ? JSON.parse(driveFolders) : null,
+          drive_custom_folders: driveCustomFolders ? JSON.parse(driveCustomFolders) : (driveFolders ? JSON.parse(driveFolders) : null),
           drive_file_folder_map: driveFileMap ? JSON.parse(driveFileMap) : null,
+          handoverDrafts,
+          localDB: {
+            client_db_documents: JSON.stringify(documents),
+            client_db_logs: JSON.stringify(logs),
+            client_db_notifications: JSON.stringify(notifications)
+          }
         },
-        data: serverPayload.data
+        data: backupData
       };
 
       // 4. Download file
@@ -154,34 +223,77 @@ export default function BackupRestorePanel({
 
     try {
       // 1. Restore server-side DB
-      const res = await fetch("/api/restore", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ backupData: restorePreview.data })
-      });
-
-      if (!res.ok) throw new Error("Gagal menyimpan data restorasi di server.");
+      try {
+        const res = await fetch("/api/restore", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ backupData: restorePreview.data })
+        });
+        if (!res.ok) {
+          console.warn("Gagal menyimpan data restorasi di server, akan dilanjutkan secara lokal.");
+        }
+      } catch (err) {
+        console.warn("Server offline - melanjutkan restorasi lokal penuh.");
+      }
 
       // 2. Restore client-side LocalStorage if present in backup file
       if (restorePreview.clientConfig) {
-        if (restorePreview.clientConfig.drive_custom_folders) {
-          localStorage.setItem(
-            "drive_custom_folders", 
-            JSON.stringify(restorePreview.clientConfig.drive_custom_folders)
-          );
+        // Restore custom drive folders correctly
+        const restoredFolders = restorePreview.clientConfig.drive_folders || restorePreview.clientConfig.drive_custom_folders;
+        if (restoredFolders) {
+          localStorage.setItem("drive_folders", JSON.stringify(restoredFolders));
+          localStorage.setItem("drive_custom_folders", JSON.stringify(restoredFolders));
         }
+
         if (restorePreview.clientConfig.drive_file_folder_map) {
           localStorage.setItem(
             "drive_file_folder_map", 
             JSON.stringify(restorePreview.clientConfig.drive_file_folder_map)
           );
         }
+
+        // Restore handover form drafts (what the user typed!)
+        if (restorePreview.clientConfig.handoverDrafts) {
+          Object.entries(restorePreview.clientConfig.handoverDrafts).forEach(([key, val]) => {
+            if (val !== null && val !== undefined) {
+              localStorage.setItem(key, val as string);
+            }
+          });
+        }
+
+        // Restore client database fallback if present
+        if (restorePreview.clientConfig.localDB) {
+          Object.entries(restorePreview.clientConfig.localDB).forEach(([key, val]) => {
+            if (val !== null && val !== undefined) {
+              localStorage.setItem(key, val as string);
+            }
+          });
+        }
+      }
+
+      // 3. Ensure the direct document/log data is also written back to LocalDB fallback keys
+      if (restorePreview.data) {
+        if (restorePreview.data.documents) {
+          localStorage.setItem("client_db_documents", JSON.stringify(restorePreview.data.documents));
+        }
+        if (restorePreview.data.logs) {
+          localStorage.setItem("client_db_logs", JSON.stringify(restorePreview.data.logs));
+        }
+        if (restorePreview.data.notifications) {
+          localStorage.setItem("client_db_notifications", JSON.stringify(restorePreview.data.notifications));
+        }
       }
 
       setSuccessMsg("Restorasi data berhasil diterapkan secara penuh!");
       setSelectedFile(null);
       setRestorePreview(null);
-      onRefresh();
+      
+      // Delay page refresh slightly or call onRefresh to reload states cleanly
+      setTimeout(() => {
+        onRefresh();
+        // Force fully reload form states if restored on mobile
+        window.location.reload();
+      }, 500);
       
       triggerPushNotification(
         "Pemulihan Data Sukses", 
@@ -350,7 +462,7 @@ export default function BackupRestorePanel({
             <input
               ref={fileInputRef}
               type="file"
-              accept=".json"
+              accept="application/json,.json,text/plain,.txt"
               className="hidden"
               onChange={handleFileChange}
             />
@@ -370,7 +482,7 @@ export default function BackupRestorePanel({
               </div>
             ) : (
               <div>
-                <p className="text-xs font-bold text-slate-600">Seret &amp; letakkan berkas .json di sini</p>
+                <p className="text-xs font-bold text-slate-600">Seret &amp; letakkan berkas cadangan (.json, .txt) di sini</p>
                 <p className="text-[10px] text-slate-400 mt-1">atau klik untuk memilih secara manual</p>
               </div>
             )}
