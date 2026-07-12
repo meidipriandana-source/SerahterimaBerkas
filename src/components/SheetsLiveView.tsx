@@ -1,6 +1,7 @@
 import React from "react";
 import { Table, Download, RefreshCw, Eye, Search, Database } from "lucide-react";
 import { DocumentHandover } from "../types";
+import { motion } from "motion/react";
 
 interface SheetsLiveViewProps {
   documents: DocumentHandover[];
@@ -119,15 +120,21 @@ export default function SheetsLiveView({ documents, onRefresh, isLoading }: Shee
                     )}
                   </td>
                   <td className="px-4 py-2.5 text-center font-sans">
-                    <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${
-                      doc.status === "completed" 
-                        ? "bg-emerald-100 text-emerald-800"
-                        : doc.status === "rejected"
-                        ? "bg-red-100 text-red-800"
-                        : doc.status === "pending_atasan"
-                        ? "bg-amber-100 text-amber-800"
-                        : "bg-indigo-100 text-indigo-800"
-                    }`}>
+                    <motion.span
+                      key={doc.status}
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ type: "spring", stiffness: 350, damping: 15 }}
+                      className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ring-1 ring-offset-0 ${
+                        doc.status === "completed" 
+                          ? "bg-emerald-100 text-emerald-800 ring-emerald-300/30"
+                          : doc.status === "rejected"
+                          ? "bg-red-100 text-red-800 ring-red-300/30"
+                          : doc.status === "pending_atasan"
+                          ? "bg-amber-100 text-amber-800 ring-amber-300/30"
+                          : "bg-indigo-100 text-indigo-800 ring-indigo-300/30"
+                      }`}
+                    >
                       {doc.status === "completed" 
                         ? "Selesai"
                         : doc.status === "rejected"
@@ -135,7 +142,7 @@ export default function SheetsLiveView({ documents, onRefresh, isLoading }: Shee
                         : doc.status === "pending_atasan"
                         ? "Proses Atasan"
                         : "Proses Admin"}
-                    </span>
+                    </motion.span>
                   </td>
                 </tr>
               ))

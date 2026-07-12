@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Folder, FileText, ExternalLink, Calendar, Search, RefreshCw, X, Printer, Download, Trash2, AlertTriangle, FolderPlus, Lock } from "lucide-react";
 import { DocumentHandover } from "../types";
 import { exportDocumentToPDF, generateDocumentHTML, getDocumentHtmlBlobUrl } from "../utils/pdfExporter";
+import { motion } from "motion/react";
 
 interface DriveLiveViewProps {
   documents: DocumentHandover[];
@@ -540,13 +541,19 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
 
                   {/* Top Right Action & Status Area */}
                   <div className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1.5">
-                    <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase ${
-                      doc.status === "completed" 
-                        ? "bg-emerald-100 text-emerald-800" 
-                        : "bg-amber-100 text-amber-800"
-                    }`}>
+                    <motion.span
+                      key={doc.status}
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ type: "spring", stiffness: 350, damping: 15 }}
+                      className={`text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase ring-1 ring-offset-0 ${
+                        doc.status === "completed" 
+                          ? "bg-emerald-100 text-emerald-800 ring-emerald-300/20" 
+                          : "bg-amber-100 text-amber-800 ring-amber-300/20"
+                      }`}
+                    >
                       {doc.status === "completed" ? "Selesai" : "Draft TTD"}
-                    </span>
+                    </motion.span>
                     
                     <button
                       type="button"

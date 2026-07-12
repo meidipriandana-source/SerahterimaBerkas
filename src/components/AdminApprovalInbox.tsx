@@ -265,6 +265,7 @@ export default function AdminApprovalInbox({
                   onClear={() => setAdminSignature("")}
                   placeholder="Gambar tanda tangan Admin di sini..."
                   height={120}
+                  initialValue={adminSignature}
                 />
 
                 <div className="flex gap-2 justify-end pt-3">

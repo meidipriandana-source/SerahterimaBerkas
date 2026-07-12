@@ -359,6 +359,7 @@ export default function SupervisorApprovalInbox({
                       onClear={() => setSupervisorSignature("")}
                       placeholder={`Tanda tangan ${activeSigningSupervisor} di sini...`}
                       height={120}
+                      initialValue={supervisorSignature}
                     />
                   </div>
                 </div>

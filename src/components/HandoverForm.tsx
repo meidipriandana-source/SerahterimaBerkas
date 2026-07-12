@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FileText, Send, User, Mail, HelpCircle, ClipboardCheck, ArrowRight, CheckCircle2, Clock, Plus, Trash2, AlertTriangle, Pencil } from "lucide-react";
 import SignaturePad from "./SignaturePad";
 import { DocumentHandover } from "../types";
+import { motion } from "motion/react";
 
 interface HandoverFormProps {
   onSuccessSubmit: (newDoc: DocumentHandover) => void;
@@ -298,9 +299,26 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
 
   if (successDoc) {
     return (
-      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm max-w-2xl mx-auto text-center" id="success-submitted-card">
-        <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-          <CheckCircle2 className="w-10 h-10 animate-bounce" />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.94, y: 15 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 180, damping: 20 }}
+        className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm max-w-2xl mx-auto text-center" 
+        id="success-submitted-card"
+      >
+        <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 relative">
+          <motion.div
+            initial={{ scale: 0, rotate: -45 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ delay: 0.15, type: "spring", stiffness: 220, damping: 15 }}
+          >
+            <CheckCircle2 className="w-10 h-10" />
+          </motion.div>
+          <motion.div
+            animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0, 0.5] }}
+            transition={{ repeat: Infinity, duration: 2.2, ease: "easeInOut" }}
+            className="absolute inset-0 rounded-full bg-emerald-400/30 -z-10"
+          />
         </div>
         <h2 className="text-xl font-bold text-slate-800">Serah Terima Berhasil Diajukan!</h2>
         <p className="text-sm text-slate-500 mt-2">
@@ -344,7 +362,7 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
         >
           Buat Pengajuan Baru
         </button>
-      </div>
+      </motion.div>
     );
   }
 
