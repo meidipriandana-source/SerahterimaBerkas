@@ -661,9 +661,9 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                           {idx + 1}
                         </div>
                         <div className={`flex-1 min-w-0 p-3.5 rounded-xl border transition-all duration-300 ${isChecked ? 'bg-emerald-50/40 border-emerald-200 shadow-3xs' : 'bg-white border-slate-200/60 shadow-3xs hover:border-indigo-200'}`}>
-                          <div className="flex items-start justify-between gap-1.5">
+                          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-1.5">
                             {/* Checkbox & Item Title */}
-                            <label className="flex items-start gap-2.5 cursor-pointer select-none group min-w-0 flex-1">
+                            <label className="flex items-start gap-2.5 cursor-pointer select-none group min-w-0 w-full sm:flex-1">
                               <input
                                 type="checkbox"
                                 checked={isChecked}
@@ -742,13 +742,13 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                                   }}
                                 />
                               ) : (
-                                <span className={`font-extrabold text-xs leading-normal transition-all duration-350 ${isChecked ? 'text-emerald-800 line-through decoration-emerald-500 decoration-2' : 'text-slate-800 group-hover:text-indigo-900'}`}>
+                                <span className={`font-extrabold text-xs leading-relaxed transition-all duration-350 break-words ${isChecked ? 'text-emerald-800 line-through decoration-emerald-500 decoration-2' : 'text-slate-800 group-hover:text-indigo-900'}`}>
                                   {item}
                                 </span>
                               )}
                             </label>
 
-                            <div className="flex flex-col items-end gap-1 shrink-0">
+                            <div className="flex flex-row items-center sm:flex-col sm:items-end justify-between sm:justify-start gap-2 sm:gap-1.5 shrink-0 w-full sm:w-auto pt-2.5 sm:pt-0 mt-1.5 sm:mt-0 border-t border-dashed border-slate-100 sm:border-t-0">
                               <div className="flex items-center gap-1.5">
                                 <span className={`text-[8px] font-extrabold px-1.5 py-0.5 rounded-full uppercase shrink-0 transition-colors ${isChecked ? 'bg-emerald-200 text-emerald-900' : 'bg-indigo-100 text-indigo-800'}`}>
                                   Berkas {idx + 1}
