@@ -341,14 +341,14 @@ export default function BackupRestorePanel({
   return (
     <div className="space-y-6 animate-fadeIn" id="backup-restore-panel">
       {/* Title block */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+          <div className="p-3 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-xl">
             <Database className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-base font-extrabold text-slate-800">Manajemen &amp; Cadangan Data</h2>
-            <p className="text-xs text-slate-500 mt-1">
+            <h2 className="text-base font-extrabold text-slate-800 dark:text-slate-100">Manajemen &amp; Cadangan Data</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               Amankan, ekspor, atau pulihkan seluruh basis data digital serah terima berkas PT.DANADIKLAT.
             </p>
           </div>
@@ -357,14 +357,14 @@ export default function BackupRestorePanel({
 
       {/* Alert Messages */}
       {errorMsg && (
-        <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-xs font-semibold flex items-start gap-2.5 animate-shake">
+        <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-400 p-4 rounded-xl text-xs font-semibold flex items-start gap-2.5 animate-shake">
           <AlertTriangle className="w-4.5 h-4.5 shrink-0 text-red-500" />
           <span>{errorMsg}</span>
         </div>
       )}
 
       {successMsg && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-xl text-xs font-semibold flex items-start gap-2.5">
+        <div className="bg-emerald-50 dark:bg-emerald-950/10 border border-emerald-200 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 p-4 rounded-xl text-xs font-semibold flex items-start gap-2.5">
           <CheckCircle2 className="w-4.5 h-4.5 shrink-0 text-emerald-500" />
           <span>{successMsg}</span>
         </div>
@@ -372,17 +372,17 @@ export default function BackupRestorePanel({
 
       {/* Stats Overview */}
       <div className="grid grid-cols-3 gap-3.5">
-        <div className="bg-white p-4 rounded-xl border border-slate-200 text-center">
-          <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Total Berkas</span>
-          <div className="text-2xl font-black text-indigo-600 mt-1">{docCount}</div>
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
+          <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">Total Berkas</span>
+          <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1">{docCount}</div>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200 text-center">
-          <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Selesai (Signed)</span>
-          <div className="text-2xl font-black text-emerald-600 mt-1">{completedCount}</div>
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
+          <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">Selesai (Signed)</span>
+          <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{completedCount}</div>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-200 text-center">
-          <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Menunggu Proses</span>
-          <div className="text-2xl font-black text-amber-500 mt-1">{pendingCount}</div>
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
+          <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">Menunggu Proses</span>
+          <div className="text-2xl font-black text-amber-500 dark:text-amber-400 mt-1">{pendingCount}</div>
         </div>
       </div>
 
@@ -390,19 +390,19 @@ export default function BackupRestorePanel({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         
         {/* Export Card */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between space-y-4">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs flex flex-col justify-between space-y-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Download className="w-5 h-5 text-indigo-500" />
-              <h3 className="text-xs font-black uppercase text-slate-700 tracking-wider">Ekspor Database (Backup)</h3>
+              <h3 className="text-xs font-black uppercase text-slate-700 dark:text-slate-200 tracking-wider">Ekspor Database (Backup)</h3>
             </div>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
               Unduh salinan lengkap basis data digital (termasuk berkas, tanda tangan digital, alur verifikasi, serta log sistem terbaru) ke dalam format JSON standar yang aman.
             </p>
           </div>
 
-          <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-3.5 space-y-2 text-[11px] text-slate-500">
-            <div className="flex items-center gap-2 font-semibold text-slate-600">
+          <div className="bg-slate-50/70 dark:bg-slate-950/50 border border-slate-100 dark:border-slate-850/60 rounded-xl p-3.5 space-y-2 text-[11px] text-slate-500">
+            <div className="flex items-center gap-2 font-semibold text-slate-600 dark:text-slate-400">
               <Info className="w-3.5 h-3.5 text-indigo-500" />
               <span>Cakupan File Cadangan:</span>
             </div>
@@ -435,13 +435,13 @@ export default function BackupRestorePanel({
         </div>
 
         {/* Import/Restore Card */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between space-y-4">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 shadow-xs flex flex-col justify-between space-y-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Upload className="w-5 h-5 text-indigo-500" />
-              <h3 className="text-xs font-black uppercase text-slate-700 tracking-wider">Pulihkan Database (Restore)</h3>
+              <h3 className="text-xs font-black uppercase text-slate-700 dark:text-slate-200 tracking-wider">Pulihkan Database (Restore)</h3>
             </div>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
               Unggah berkas JSON cadangan yang telah diekspor sebelumnya untuk mengembalikan seluruh kondisi data dan alur verifikasi PT.DANADIKLAT.
             </p>
           </div>
@@ -455,8 +455,8 @@ export default function BackupRestorePanel({
             onClick={() => fileInputRef.current?.click()}
             className={`border-2 border-dashed rounded-xl p-5 text-center transition-all cursor-pointer flex flex-col items-center justify-center space-y-2.5 ${
               dragActive 
-                ? "border-indigo-500 bg-indigo-50/50" 
-                : "border-slate-200 hover:border-indigo-400 bg-slate-50/30 hover:bg-slate-50/60"
+                ? "border-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/30" 
+                : "border-slate-200 dark:border-slate-800 hover:border-indigo-400 bg-slate-50/30 dark:bg-slate-950/10 hover:bg-slate-50/60 dark:hover:bg-slate-900/40"
             }`}
           >
             <input
@@ -467,42 +467,42 @@ export default function BackupRestorePanel({
               onChange={handleFileChange}
             />
             
-            <div className="p-2 bg-indigo-50 text-indigo-500 rounded-full">
+            <div className="p-2 bg-indigo-50 dark:bg-indigo-950 text-indigo-500 dark:text-indigo-400 rounded-full">
               <FileText className="w-5 h-5" />
             </div>
             
             {selectedFile ? (
               <div className="space-y-1">
-                <p className="text-[11px] font-black text-indigo-700 truncate max-w-[250px]">
+                <p className="text-[11px] font-black text-indigo-700 dark:text-indigo-400 truncate max-w-[250px]">
                   {selectedFile.name}
                 </p>
-                <p className="text-[9px] text-slate-400">
+                <p className="text-[9px] text-slate-400 dark:text-slate-500">
                   {(selectedFile.size / 1024).toFixed(1)} KB &bull; Klik untuk mengganti
                 </p>
               </div>
             ) : (
               <div>
-                <p className="text-xs font-bold text-slate-600">Seret &amp; letakkan berkas cadangan (.json, .txt) di sini</p>
-                <p className="text-[10px] text-slate-400 mt-1">atau klik untuk memilih secara manual</p>
+                <p className="text-xs font-bold text-slate-600 dark:text-slate-300">Seret &amp; letakkan berkas cadangan (.json, .txt) di sini</p>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">atau klik untuk memilih secara manual</p>
               </div>
             )}
           </div>
 
           {/* Restore Details Preview */}
           {restorePreview && (
-            <div className="bg-indigo-50/60 border border-indigo-100 rounded-xl p-3.5 space-y-2.5 animate-fadeIn">
-              <div className="text-[10px] font-black text-indigo-800 uppercase tracking-wider flex items-center gap-1.5">
+            <div className="bg-indigo-50/60 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/50 rounded-xl p-3.5 space-y-2.5 animate-fadeIn">
+              <div className="text-[10px] font-black text-indigo-800 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
                 <Info className="w-3.5 h-3.5 text-indigo-500" />
                 <span>Isi File Cadangan Terbaca:</span>
               </div>
-              <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-600 font-semibold">
-                <div>Versi Backup: <span className="text-indigo-600">{restorePreview.version || "1.0"}</span></div>
-                <div>Tanggal: <span className="text-indigo-600">{restorePreview.timestamp ? new Date(restorePreview.timestamp).toLocaleDateString("id-ID") : "-"}</span></div>
-                <div>Jumlah Berkas: <span className="text-indigo-600">{restorePreview.data?.documents?.length || 0} unit</span></div>
-                <div>Jumlah Log: <span className="text-indigo-600">{restorePreview.data?.logs?.length || 0} baris</span></div>
+              <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-600 dark:text-slate-400 font-semibold">
+                <div>Versi Backup: <span className="text-indigo-600 dark:text-indigo-400">{restorePreview.version || "1.0"}</span></div>
+                <div>Tanggal: <span className="text-indigo-600 dark:text-indigo-400">{restorePreview.timestamp ? new Date(restorePreview.timestamp).toLocaleDateString("id-ID") : "-"}</span></div>
+                <div>Jumlah Berkas: <span className="text-indigo-600 dark:text-indigo-400">{restorePreview.data?.documents?.length || 0} unit</span></div>
+                <div>Jumlah Log: <span className="text-indigo-600 dark:text-indigo-400">{restorePreview.data?.logs?.length || 0} baris</span></div>
               </div>
 
-              <div className="border-t border-indigo-100 pt-2 mt-2">
+              <div className="border-t border-indigo-100 dark:border-indigo-900/50 pt-2 mt-2">
                 <button
                   type="button"
                   disabled={isRestoreLoading}
@@ -523,20 +523,20 @@ export default function BackupRestorePanel({
       </div>
 
       {/* Dangerous Action Block - Factory Reset */}
-      <div className="bg-red-50/50 border border-red-200 rounded-2xl p-5 space-y-4">
+      <div className="bg-red-50/50 dark:bg-red-950/10 border border-red-200 dark:border-red-900/40 rounded-2xl p-5 space-y-4">
         <div className="flex items-start gap-3">
-          <div className="p-2 bg-red-100 text-red-600 rounded-xl shrink-0">
+          <div className="p-2 bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 rounded-xl shrink-0">
             <AlertTriangle className="w-5 h-5" />
           </div>
           <div className="space-y-1">
-            <h4 className="text-xs font-black uppercase text-red-800 tracking-wider">Zona Bahaya (Sistem Reset)</h4>
-            <p className="text-xs text-red-700/80 leading-relaxed">
+            <h4 className="text-xs font-black uppercase text-red-800 dark:text-red-400 tracking-wider">Zona Bahaya (Sistem Reset)</h4>
+            <p className="text-xs text-red-700/80 dark:text-red-300/80 leading-relaxed">
               Mengembalikan portal ke setelan awal pabrik. Tindakan ini akan menghapus seluruh data yang telah Anda tambahkan secara permanen, dan mengembalikan basis data ke daftar data contoh bawaan PT.DANADIKLAT.
             </p>
           </div>
         </div>
 
-        <div className="flex justify-end border-t border-red-200/40 pt-3">
+        <div className="flex justify-end border-t border-red-200/40 dark:border-red-900/40 pt-3">
           <button
             type="button"
             disabled={isResetLoading}

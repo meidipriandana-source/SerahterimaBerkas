@@ -762,12 +762,12 @@ export default function AdminApprovalInbox({
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Staff Signed */}
-                <div className="border border-slate-200 rounded-lg p-3 bg-white space-y-2 flex flex-col items-center text-center">
-                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Tanda Tangan Pengaju (Staff)</span>
-                  <div className="border border-slate-100 rounded-md bg-slate-50 p-1 w-full flex items-center justify-center">
+                <div className="border border-slate-200 dark:border-slate-800 rounded-lg p-3 bg-white dark:bg-slate-900 space-y-2 flex flex-col items-center text-center">
+                  <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Tanda Tangan Pengaju (Staff)</span>
+                  <div className="border border-slate-100 dark:border-slate-800 rounded-md bg-slate-50 dark:bg-slate-950 p-1 w-full flex items-center justify-center">
                     <img src={selectedDoc.senderSignature} alt="TTD Staff" className="h-14 max-w-[150px] object-contain" />
                   </div>
-                  <span className="text-[10px] font-bold text-slate-700">
+                  <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300">
                     {selectedDoc.senderName === "Budi Santoso" ? "Budi Santoso, untuk pihak pertama Meidi Priandana" : selectedDoc.senderName}
                   </span>
                 </div>
@@ -843,7 +843,7 @@ export default function AdminApprovalInbox({
                     value={rejectReason}
                     onChange={(e) => setRejectReason(e.target.value)}
                     id="admin-reject-reason-input"
-                    className="w-full text-xs border border-slate-300 rounded-lg px-2.5 py-2 focus:outline-hidden focus:ring-1 focus:ring-red-500 bg-white"
+                    className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-2 focus:outline-hidden focus:ring-1 focus:ring-red-500 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
                   />
                 </div>
 
@@ -962,7 +962,7 @@ export default function AdminApprovalInbox({
             ) : (
               <div className="space-y-3 pt-1">
                 <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block uppercase text-left">Bubuhkan Tanda Tangan Baru:</span>
-                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white">
+                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-950">
                   <SignaturePad
                     onSave={(sig) => {
                       handleQuickAdminSign(swipeApproveDoc, sig);

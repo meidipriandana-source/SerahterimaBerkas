@@ -321,19 +321,19 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
   };
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs" id="drive-live-view">
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs" id="drive-live-view">
       {/* Google Drive Header Mockup */}
-      <div className="bg-slate-50 border-b border-slate-200 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <div className="bg-indigo-600 text-white p-1.5 rounded-lg">
             <Folder className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+            <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
               My Drive &gt; Serah_Terima_PDFs 
-              <span className="bg-indigo-100 text-indigo-800 text-[9px] px-1.5 py-0.2 rounded-full font-bold">Google Drive</span>
+              <span className="bg-indigo-100 dark:bg-indigo-950/40 text-indigo-800 dark:text-indigo-400 text-[9px] px-1.5 py-0.2 rounded-full font-bold">Google Drive</span>
             </h3>
-            <p className="text-[10px] text-slate-400">Penyimpanan cloud otomatis berkas PDF bukti serah terima yang telah sah.</p>
+            <p className="text-[10px] text-slate-400 dark:text-slate-500">Penyimpanan cloud otomatis berkas PDF bukti serah terima yang telah sah.</p>
           </div>
         </div>
 
@@ -358,7 +358,7 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               id="drive-search-input"
-              className="text-xs border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 w-44 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 bg-white"
+              className="text-xs border border-slate-200 dark:border-slate-700 rounded-lg pl-8 pr-3 py-1.5 w-44 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 bg-white dark:bg-slate-850 text-slate-800 dark:text-slate-100"
             />
           </div>
 
@@ -366,7 +366,7 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
             onClick={onRefresh}
             disabled={isLoading}
             id="btn-refresh-drive"
-            className="p-1.5 bg-white hover:bg-slate-50 text-slate-600 rounded-lg border border-slate-200 transition disabled:opacity-50 cursor-pointer animate-none"
+            className="p-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700 transition disabled:opacity-50 cursor-pointer animate-none"
             title="Refresh folder"
           >
             <RefreshCw className={`w-4 h-4 ${isLoading || isDeleting ? 'animate-spin' : ''}`} />
@@ -375,7 +375,7 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
       </div>
 
       {/* Folder Breadcrumbs */}
-      <div className="bg-slate-50 border-b border-slate-200 px-6 py-2.5 flex items-center justify-between gap-2 text-xs font-semibold text-slate-500">
+      <div className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-6 py-2.5 flex items-center justify-between gap-2 text-xs font-semibold text-slate-500">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setCurrentFolderId(null)}
@@ -397,7 +397,7 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
         {currentFolderId && (
           <button
             onClick={() => setCurrentFolderId(null)}
-            className="text-[10px] bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 px-2 py-1 rounded-md flex items-center gap-1 transition cursor-pointer"
+            className="text-[10px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-1 rounded-md flex items-center gap-1 transition cursor-pointer"
           >
             Kembali ke Utama
           </button>
@@ -408,13 +408,13 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
       <div className="p-6">
         {/* Contreng & Delete/Move Bulk Actions Bar */}
         {activeFiles.length > 0 && (
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-5 bg-slate-50 border border-slate-200 p-3.5 rounded-xl">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-3.5 rounded-xl">
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={handleSelectAll}
                 id="btn-select-all-drive"
-                className="text-xs font-bold text-slate-700 hover:text-indigo-600 bg-white border border-slate-200 px-3 py-1.5 rounded-lg transition cursor-pointer flex items-center gap-2 shadow-3xs"
+                className="text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-lg transition cursor-pointer flex items-center gap-2 shadow-3xs"
               >
                 <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
                   activeFiles.length > 0 && activeFiles.every(doc => selectedIds.includes(doc.id))
@@ -519,7 +519,7 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
                   className={`border rounded-xl p-4 flex flex-col items-center justify-between text-center hover:shadow-sm transition duration-200 group cursor-pointer relative ${
                     isSelected 
                       ? "border-indigo-500 bg-indigo-50/25 ring-1 ring-indigo-500" 
-                      : "border-slate-200 bg-white hover:border-indigo-300"
+                      : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-indigo-300 dark:hover:border-indigo-500 text-slate-800 dark:text-slate-100"
                   }`}
                 >
                   {/* Top Left Selection Checkbox */}
@@ -531,7 +531,7 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
                       className={`w-5 h-5 rounded border flex items-center justify-center transition cursor-pointer shadow-3xs ${
                         isSelected 
                           ? "bg-indigo-600 border-indigo-600 text-white" 
-                          : "bg-white/90 border-slate-300 text-transparent hover:border-indigo-500"
+                          : "bg-white/90 dark:bg-slate-800 border-slate-300 dark:border-slate-750 text-transparent hover:border-indigo-500"
                       }`}
                       title={isSelected ? "Batal pilih berkas" : "Contreng / Pilih berkas"}
                     >
@@ -548,8 +548,8 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
                       transition={{ type: "spring", stiffness: 350, damping: 15 }}
                       className={`text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase ring-1 ring-offset-0 ${
                         doc.status === "completed" 
-                          ? "bg-emerald-100 text-emerald-800 ring-emerald-300/20" 
-                          : "bg-amber-100 text-amber-800 ring-amber-300/20"
+                          ? "bg-emerald-100 dark:bg-emerald-950/45 text-emerald-800 dark:text-emerald-400 ring-emerald-300/20" 
+                          : "bg-amber-100 dark:bg-amber-950/45 text-amber-800 dark:text-amber-400 ring-amber-300/20"
                       }`}
                     >
                       {doc.status === "completed" ? "Selesai" : "Draft TTD"}
@@ -559,7 +559,7 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
                       type="button"
                       onClick={(e) => handleOpenMoveModal([doc.id], e)}
                       id={`btn-move-card-${doc.id}`}
-                      className="p-1 bg-white hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-md border border-slate-200 transition cursor-pointer shadow-3xs"
+                      className="p-1 bg-white dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-md border border-slate-200 dark:border-slate-700 transition cursor-pointer shadow-3xs"
                       title="Pindahkan berkas ke folder"
                     >
                       <FolderPlus className="w-3 h-3" />
@@ -572,7 +572,7 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
                         exportDocumentToPDF(doc);
                       }}
                       id={`btn-export-card-${doc.id}`}
-                      className="p-1 bg-white hover:bg-emerald-50 text-slate-400 hover:text-emerald-600 rounded-md border border-slate-200 transition cursor-pointer shadow-3xs"
+                      className="p-1 bg-white dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 text-slate-400 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-md border border-slate-200 dark:border-slate-700 transition cursor-pointer shadow-3xs"
                       title="Ekspor ke PDF Resmi"
                     >
                       <Download className="w-3 h-3" />
@@ -582,7 +582,7 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
                       type="button"
                       onClick={(e) => handleDeleteSingle(doc.id, doc.title, e)}
                       id={`btn-delete-card-${doc.id}`}
-                      className="p-1 bg-white hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-md border border-slate-200 transition cursor-pointer shadow-3xs relative"
+                      className="p-1 bg-white dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-950/50 text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 rounded-md border border-slate-200 dark:border-slate-700 transition cursor-pointer shadow-3xs relative"
                       title={doc.status === "completed" ? "Hapus berkas final (Membutuhkan konfirmasi ekstra)" : "Hapus berkas permanen"}
                     >
                       <Trash2 className="w-3 h-3" />
@@ -595,15 +595,15 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
                   </div>
 
                   <div className="my-3 flex flex-col items-center">
-                    <div className="p-3 bg-red-50 text-red-500 rounded-lg group-hover:bg-red-100 transition duration-200">
+                    <div className="p-3 bg-red-50 dark:bg-red-950/40 text-red-500 dark:text-red-400 rounded-lg group-hover:bg-red-100 transition duration-200">
                       <FileText className="w-10 h-10 stroke-1.5" />
                     </div>
-                    <span className="text-xs font-bold text-slate-700 mt-3 line-clamp-2 px-1 text-center" title={doc.title}>
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200 mt-3 line-clamp-2 px-1 text-center" title={doc.title}>
                       Bukti_Serah_Terima_{doc.verificationCode}.pdf
                     </span>
                   </div>
 
-                  <div className="w-full pt-2 border-t border-slate-100 flex items-center justify-between text-[9px] text-slate-400">
+                  <div className="w-full pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[9px] text-slate-400">
                     <span className="flex items-center gap-1">
                       <Calendar className="w-3 h-3" /> {formattedDate}
                     </span>
@@ -692,25 +692,24 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
           </div>
         </div>
       )}
-
-      {/* Custom Deletion Confirmation Modal */}
+            {/* Custom Deletion Confirmation Modal */}
       {deleteModal.isOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fadeIn" id="delete-confirmation-overlay">
-          <div className="bg-white w-full max-w-md rounded-2xl overflow-hidden shadow-2xl border border-slate-200 p-6 flex flex-col gap-4">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col gap-4">
             <div className="flex items-start gap-3.5">
-              <div className="bg-red-50 text-red-600 p-2.5 rounded-xl shrink-0">
+              <div className="bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 p-2.5 rounded-xl shrink-0">
                 <AlertTriangle className="w-6 h-6" />
               </div>
               <div className="flex-1">
-                <h3 className="text-sm font-bold text-slate-950">Konfirmasi Hapus Berkas</h3>
-                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                <h3 className="text-sm font-bold text-slate-950 dark:text-slate-100">Konfirmasi Hapus Berkas</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
                   {deleteModal.description}
                 </p>
               </div>
             </div>
 
             {deleteModal.isCompletedWarning && (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 px-3.5 flex items-start gap-2.5 my-1">
+              <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-xl p-3 px-3.5 flex items-start gap-2.5 my-1">
                 <input
                   type="checkbox"
                   id="checkbox-confirm-bypass"
@@ -718,14 +717,14 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
                   onChange={(e) => setConfirmBypassChecked(e.target.checked)}
                   className="mt-0.5 w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500 cursor-pointer shrink-0"
                 />
-                <label htmlFor="checkbox-confirm-bypass" className="text-[11px] text-amber-800 font-bold select-none cursor-pointer leading-tight">
+                <label htmlFor="checkbox-confirm-bypass" className="text-[11px] text-amber-800 dark:text-amber-300 font-bold select-none cursor-pointer leading-tight">
                   Ya, saya mengerti berkas ini berstatus SELESAI (Read-Only) dan saya tetap ingin menghapusnya secara permanen dari server dan Google Drive.
                 </label>
               </div>
             )}
 
             {deleteModal.errorMessage && (
-              <div className="bg-red-50 border border-red-100 text-red-700 p-2.5 rounded-lg text-xs font-semibold">
+              <div className="bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 text-red-700 dark:text-red-400 p-2.5 rounded-lg text-xs font-semibold">
                 {deleteModal.errorMessage}
               </div>
             )}
@@ -736,7 +735,7 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
                 onClick={() => setDeleteModal({ isOpen: false, ids: [], description: "", errorMessage: "" })}
                 disabled={isDeleting}
                 id="btn-cancel-delete"
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-black transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-black transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Batal
               </button>
@@ -767,21 +766,20 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
           </div>
         </div>
       )}
-
-      {/* Custom Folder Creation Modal */}
+            {/* Custom Folder Creation Modal */}
       {isCreateFolderOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fadeIn" id="create-folder-modal-overlay">
           <form 
             onSubmit={handleExecuteCreateFolder}
-            className="bg-white w-full max-w-md rounded-2xl overflow-hidden shadow-2xl border border-slate-200 p-6 flex flex-col gap-4"
+            className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col gap-4"
           >
             <div className="flex items-start gap-3.5">
-              <div className="bg-indigo-50 text-indigo-600 p-2.5 rounded-xl shrink-0">
+              <div className="bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 p-2.5 rounded-xl shrink-0">
                 <FolderPlus className="w-6 h-6" />
               </div>
               <div className="flex-1">
-                <h3 className="text-sm font-bold text-slate-950">Buat Folder Baru</h3>
-                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                <h3 className="text-sm font-bold text-slate-950 dark:text-slate-100">Buat Folder Baru</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
                   Masukkan nama folder baru untuk merapikan berkas bukti serah terima Anda.
                 </p>
               </div>
@@ -798,14 +796,14 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
                   setNewFolderName(e.target.value);
                   setCreateFolderError("");
                 }}
-                className="w-full text-xs border border-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"
+                className="w-full text-xs border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white dark:bg-slate-850 text-slate-800 dark:text-slate-100"
                 autoFocus
               />
               <p className="text-[9px] text-slate-400 mt-1">Spasi akan otomatis diubah menjadi karakter underscore (_)</p>
             </div>
 
             {createFolderError && (
-              <div className="bg-red-50 border border-red-100 text-red-700 p-2.5 rounded-lg text-xs font-semibold">
+              <div className="bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 text-red-700 dark:text-red-400 p-2.5 rounded-lg text-xs font-semibold">
                 {createFolderError}
               </div>
             )}
@@ -815,7 +813,7 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
                 type="button"
                 onClick={() => setIsCreateFolderOpen(false)}
                 id="btn-cancel-create-folder"
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-black transition cursor-pointer"
+                className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-black transition cursor-pointer"
               >
                 Batal
               </button>
@@ -831,35 +829,34 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
           </form>
         </div>
       )}
-
-      {/* Custom Move File to Folder Modal */}
+            {/* Custom Move File to Folder Modal */}
       {moveModal.isOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fadeIn" id="move-folder-modal-overlay">
-          <div className="bg-white w-full max-w-md rounded-2xl overflow-hidden shadow-2xl border border-slate-200 p-6 flex flex-col gap-4">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col gap-4">
             <div className="flex items-start gap-3.5">
-              <div className="bg-indigo-50 text-indigo-600 p-2.5 rounded-xl shrink-0">
+              <div className="bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 p-2.5 rounded-xl shrink-0">
                 <Folder className="w-6 h-6 text-indigo-500 fill-indigo-100 animate-pulse" />
               </div>
               <div className="flex-1">
-                <h3 className="text-sm font-bold text-slate-950">Pindahkan Berkas ke Folder</h3>
-                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                <h3 className="text-sm font-bold text-slate-950 dark:text-slate-100">Pindahkan Berkas ke Folder</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
                   Pilih folder tujuan untuk memindahkan {moveModal.fileIds.length} berkas bukti serah terima.
                 </p>
               </div>
             </div>
 
-            <div className="max-h-60 overflow-y-auto border border-slate-100 rounded-xl divide-y divide-slate-100 mt-2">
+            <div className="max-h-60 overflow-y-auto border border-slate-100 dark:border-slate-800 rounded-xl divide-y divide-slate-100 dark:divide-slate-800 mt-2">
               {/* Root Drive option */}
               <button
                 type="button"
                 onClick={() => handleExecuteMove(null)}
-                className="w-full text-left px-4 py-3 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-indigo-600 flex items-center justify-between transition cursor-pointer"
+                className="w-full text-left px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center justify-between transition cursor-pointer"
               >
                 <span className="flex items-center gap-2">
                   <Folder className="w-4 h-4 text-slate-400" />
                   <span>Drive Utama (Serah_Terima_PDFs)</span>
                 </span>
-                <span className="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-md font-bold uppercase">Root</span>
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-md font-bold uppercase">Root</span>
               </button>
 
               {/* Dynamic Folders */}
@@ -868,13 +865,13 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
                   key={folder.id}
                   type="button"
                   onClick={() => handleExecuteMove(folder.id)}
-                  className="w-full text-left px-4 py-3 text-xs font-semibold text-slate-700 hover:bg-indigo-50/50 hover:text-indigo-600 flex items-center justify-between transition cursor-pointer"
+                  className="w-full text-left px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-indigo-50/50 dark:hover:bg-slate-850 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center justify-between transition cursor-pointer"
                 >
                   <span className="flex items-center gap-2">
                     <Folder className="w-4 h-4 text-amber-500 fill-amber-100" />
                     <span>{folder.name}</span>
                   </span>
-                  <span className="text-[9px] text-slate-400 font-semibold uppercase">Folder</span>
+                  <span className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold uppercase">Folder</span>
                 </button>
               ))}
             </div>
@@ -884,7 +881,7 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
                 type="button"
                 onClick={() => setMoveModal({ isOpen: false, fileIds: [] })}
                 id="btn-cancel-move"
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-black transition cursor-pointer"
+                className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-black transition cursor-pointer"
               >
                 Batal
               </button>

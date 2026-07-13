@@ -441,7 +441,7 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
 
   return (
     <div className="space-y-5 max-w-3xl mx-auto">
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden" id="handover-form">
+      <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden" id="handover-form">
       {/* Header Form - Removed as requested */}
 
       <div className="p-6 space-y-6">
@@ -453,7 +453,7 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-2 space-y-1">
-              <label className="text-xs font-bold text-slate-700 flex items-center">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center">
                 Judul Berkas / Unit Barang <span className="text-red-500 ml-0.5">*</span>
               </label>
               <input
@@ -463,12 +463,12 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 id="form-input-title"
-                className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 placeholder-slate-400 transition"
+                className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 placeholder-slate-400 dark:placeholder-slate-500 transition bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
               />
             </div>
             
             <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700">Kategori Berkas</label>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Kategori Berkas</label>
               <select
                 value={category}
                 onChange={(e) => {
@@ -486,7 +486,7 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                   const isDescDefault = !description.trim() || [
                     "Berkas laporan pertanggungjawaban (SPJ) kegiatan diklat dan pelatihan, meliputi berkas kelengkapan administrasi, surat tugas, sertifikat, rincian biaya, dan dokumentasi pelaksanaan kegiatan.",
                     "Dokumen telaah staf pengajuan diklat/pelatihan eksternal bagi pegawai RSUD.",
-                    "Dokumen Surat Keputusan (SK) resmi direksi terkait tugas belajar dan pelatihan pegawai.",
+                    "Dokumen Surat Keputusan (SK) resmi direksi terkait tugas belajar and pelatihan pegawai.",
                     "Dokumen fisik kontrak kerjasama sewa jasa operasional kantor RSUD selama 12 bulan."
                   ].includes(description.trim());
 
@@ -515,7 +515,7 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                   }
                 }}
                 id="form-select-category"
-                className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 transition bg-white"
+                className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 transition bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
               >
                 {categories.map((cat) => (
                   <option key={cat} value={cat}>{cat}</option>
@@ -524,19 +524,19 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
             </div>
 
             <div className="md:col-span-3 space-y-1">
-              <label className="text-xs font-bold text-slate-700">Deskripsi / Keterangan Detil Berkas</label>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Deskripsi / Keterangan Detil Berkas</label>
               <textarea
                 rows={3}
                 placeholder="Tuliskan keterangan detail, kelengkapan, nomor seri barang, atau poin kontrak penting di sini..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 id="form-textarea-desc"
-                className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 placeholder-slate-400 transition resize-none"
+                className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 placeholder-slate-400 dark:placeholder-slate-500 transition resize-none bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
               />
             </div>
 
             {/* Tambah Berkas Button */}
-            <div className="md:col-span-3 flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 bg-slate-50 p-3.5 rounded-xl border border-dashed border-slate-200">
+            <div className="md:col-span-3 flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 bg-slate-50 dark:bg-slate-850 p-3.5 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
               <span className="text-[10px] text-slate-500 font-bold leading-normal text-center sm:text-left">
                 {items.length > 0 ? (
                   <span className="text-emerald-700 font-extrabold flex items-center gap-1.5 justify-center sm:justify-start">
@@ -560,7 +560,7 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
         </div>
 
         {/* Section 2: Pihak Terkait */}
-        <div className="border-t border-slate-100 pt-6">
+        <div className="border-t border-slate-100 dark:border-slate-800 pt-6">
           <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
             2. Pihak Terkait &amp; Alur Persetujuan
@@ -568,11 +568,11 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Staff / Pengaju (Pihak Pertama) */}
-            <div className="p-4 bg-slate-50 rounded-lg border border-slate-200/60 space-y-3">
-              <span className="text-[10px] font-bold text-indigo-600 uppercase bg-indigo-50 px-2 py-0.5 rounded-sm">Pihak Pertama (Pengaju)</span>
+            <div className="p-4 bg-slate-50 dark:bg-slate-850 rounded-lg border border-slate-200/60 dark:border-slate-800 space-y-3">
+              <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase bg-indigo-50 dark:bg-indigo-950/40 px-2 py-0.5 rounded-sm">Pihak Pertama (Pengaju)</span>
               
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-slate-600 flex items-center">
+                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center">
                   <User className="w-3.5 h-3.5 mr-1 text-slate-400" /> Nama Staff
                 </label>
                 <input
@@ -580,12 +580,12 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                   value={senderName}
                   onChange={(e) => setSenderName(e.target.value)}
                   id="form-input-sender-name"
-                  className="w-full text-xs border border-slate-300 rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 transition"
+                  className="w-full text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 transition"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-slate-600 flex items-center">
+                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center">
                   <Mail className="w-3.5 h-3.5 mr-1 text-slate-400" /> Email Staff
                 </label>
                 <input
@@ -593,17 +593,17 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                   value={senderEmail}
                   onChange={(e) => setSenderEmail(e.target.value)}
                   id="form-input-sender-email"
-                  className="w-full text-xs border border-slate-300 rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 transition"
+                  className="w-full text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 transition"
                 />
               </div>
             </div>
 
             {/* Penerima Berkas (Pihak Kedua) */}
-            <div className="p-4 bg-slate-50 rounded-lg border border-slate-200/60 space-y-3">
-              <span className="text-[10px] font-bold text-emerald-600 uppercase bg-emerald-100/60 px-2 py-0.5 rounded-sm">Pihak Penerima (Pilih Jabatan & Nama)</span>
+            <div className="p-4 bg-slate-50 dark:bg-slate-850 rounded-lg border border-slate-200/60 dark:border-slate-800 space-y-3">
+              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase bg-emerald-100/60 dark:bg-emerald-950/30 px-2 py-0.5 rounded-sm">Pihak Penerima (Pilih Jabatan & Nama)</span>
               
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-slate-600 flex items-center">
+                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center">
                   <User className="w-3.5 h-3.5 mr-1 text-slate-400" /> Jabatan Penerima <span className="text-red-500 ml-0.5">*</span>
                 </label>
                 <select
@@ -615,7 +615,7 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                     }
                   }}
                   id="form-select-recipient-position"
-                  className="w-full text-xs border border-slate-300 bg-white text-slate-800 rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 font-medium"
+                  className="w-full text-xs border border-slate-300 dark:border-slate-750 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 font-medium"
                 >
                   {recipientPositions.map((pos) => (
                     <option key={pos.name} value={pos.name}>{pos.name}</option>
@@ -624,7 +624,7 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-slate-600 flex items-center">
+                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center">
                   <User className="w-3.5 h-3.5 mr-1 text-slate-400" /> Nama Penerima <span className="text-red-500 ml-0.5">*</span>
                 </label>
                 <select
@@ -637,7 +637,7 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                     }
                   }}
                   id="form-select-recipient-person"
-                  className="w-full text-xs border border-slate-300 bg-white text-slate-800 rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 font-medium"
+                  className="w-full text-xs border border-slate-300 dark:border-slate-750 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 font-medium"
                 >
                   {recipientPersons.map((person) => (
                     <option key={person.name} value={person.name}>{person.name}</option>
@@ -646,8 +646,8 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
               </div>
 
               {/* Atasan Penyetuju Akhir (Pilih sampai 3 Atasan) */}
-              <div className="space-y-2.5 border-t border-slate-200/60 pt-3 mt-3">
-                <label className="text-[11px] font-bold text-slate-700 flex items-center">
+              <div className="space-y-2.5 border-t border-slate-200/60 dark:border-slate-800 pt-3 mt-3">
+                <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 flex items-center">
                   <span className="w-1.5 h-1.5 rounded-full bg-purple-650 mr-1.5 animate-pulse"></span>
                   Atasan Penyetuju Akhir <span className="text-red-500 ml-0.5">*</span>
                 </label>
@@ -658,11 +658,11 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                 <div className="space-y-2">
                   {/* Atasan 1 */}
                   <div className="space-y-1">
-                    <span className="text-[8px] font-black text-purple-700 bg-purple-50 border border-purple-150 px-1.5 py-0.5 rounded uppercase">Atasan Pilihan 1 (Utama)</span>
+                    <span className="text-[8px] font-black text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/45 border border-purple-150 dark:border-purple-900 px-1.5 py-0.5 rounded uppercase">Atasan Pilihan 1 (Utama)</span>
                     <select
                       value={supervisor1}
                       onChange={(e) => setSupervisor1(e.target.value)}
-                      className="w-full text-xs border border-slate-300 bg-white text-slate-800 rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 font-semibold"
+                      className="w-full text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 font-semibold"
                     >
                       {supervisors.map((s, index) => (
                         <option key={index} value={s.name}>{s.name}</option>
@@ -672,11 +672,11 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
 
                   {/* Atasan 2 */}
                   <div className="space-y-1">
-                    <span className="text-[8px] font-black text-slate-500 bg-slate-50 border border-slate-200 px-1.5 py-0.5 rounded uppercase">Atasan Pilihan 2 (Opsional)</span>
+                    <span className="text-[8px] font-black text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-1.5 py-0.5 rounded uppercase">Atasan Pilihan 2 (Opsional)</span>
                     <select
                       value={supervisor2}
                       onChange={(e) => setSupervisor2(e.target.value)}
-                      className="w-full text-xs border border-slate-300 bg-white text-slate-800 rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 font-semibold"
+                      className="w-full text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 font-semibold"
                     >
                       <option value="">-- Kosong / Tidak Ada --</option>
                       {supervisors.map((s, index) => (
@@ -687,11 +687,11 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
 
                   {/* Atasan 3 */}
                   <div className="space-y-1">
-                    <span className="text-[8px] font-black text-slate-500 bg-slate-50 border border-slate-200 px-1.5 py-0.5 rounded uppercase">Atasan Pilihan 3 (Opsional)</span>
+                    <span className="text-[8px] font-black text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-1.5 py-0.5 rounded uppercase">Atasan Pilihan 3 (Opsional)</span>
                     <select
                       value={supervisor3}
                       onChange={(e) => setSupervisor3(e.target.value)}
-                      className="w-full text-xs border border-slate-300 bg-white text-slate-800 rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 font-semibold"
+                      className="w-full text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 font-semibold"
                     >
                       <option value="">-- Kosong / Tidak Ada --</option>
                       {supervisors.map((s, index) => (
@@ -704,33 +704,33 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
             </div>
 
             {/* Alur Tanda Tangan Berkas & Waktu Real-time */}
-            <div className="md:col-span-2 p-5 bg-indigo-50/45 rounded-xl border border-indigo-100/80 space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-indigo-100/60">
+            <div className="md:col-span-2 p-5 bg-indigo-50/45 dark:bg-indigo-950/20 rounded-xl border border-indigo-100/80 dark:border-indigo-900/40 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-indigo-100/60 dark:border-indigo-900/35">
                 <div className="flex items-center gap-1.5">
                   <div className="p-1 bg-indigo-600 rounded-md text-white">
                     <Clock className="w-3.5 h-3.5 animate-pulse" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-black text-indigo-950 uppercase tracking-wide">
+                    <h4 className="text-xs font-black text-indigo-950 dark:text-indigo-200 uppercase tracking-wide">
                       Urutan Berkas &amp; Waktu Real-time
                     </h4>
-                    <p className="text-[10px] text-indigo-600 font-medium">Urutan berkas yang akan ditandatangani</p>
+                    <p className="text-[10px] text-indigo-600 dark:text-indigo-400 font-medium">Urutan berkas yang akan ditandatangani</p>
                   </div>
                 </div>
                 
                 {/* View Mode Toggle Switcher */}
-                <div className="flex items-center gap-1 bg-indigo-100 p-0.5 rounded-lg border border-indigo-200/40 self-start sm:self-center">
+                <div className="flex items-center gap-1 bg-indigo-100 dark:bg-indigo-950/60 p-0.5 rounded-lg border border-indigo-200/40 dark:border-indigo-900/45 self-start sm:self-center">
                   <button
                     type="button"
                     onClick={() => setViewMode("list")}
-                    className={`px-2 py-1 text-[9px] font-black uppercase rounded-md transition cursor-pointer ${viewMode === "list" ? "bg-white text-indigo-700 shadow-3xs" : "text-indigo-600/80 hover:text-indigo-800"}`}
+                    className={`px-2 py-1 text-[9px] font-black uppercase rounded-md transition cursor-pointer ${viewMode === "list" ? "bg-white dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 shadow-3xs" : "text-indigo-600/80 dark:text-indigo-400/80 hover:text-indigo-800 dark:hover:text-indigo-300"}`}
                   >
                     Rapat/Slim
                   </button>
                   <button
                     type="button"
                     onClick={() => setViewMode("table")}
-                    className={`px-2 py-1 text-[9px] font-black uppercase rounded-md transition cursor-pointer ${viewMode === "table" ? "bg-white text-indigo-700 shadow-3xs" : "text-indigo-600/80 hover:text-indigo-800"}`}
+                    className={`px-2 py-1 text-[9px] font-black uppercase rounded-md transition cursor-pointer ${viewMode === "table" ? "bg-white dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 shadow-3xs" : "text-indigo-600/80 dark:text-indigo-400/80 hover:text-indigo-800 dark:hover:text-indigo-300"}`}
                   >
                     Tabel (Landscape)
                   </button>
@@ -1158,7 +1158,7 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
         </div>
 
         {/* Section 3: Tanda Tangan Elektronik */}
-        <div className="border-t border-slate-100 pt-6">
+        <div className="border-t border-slate-100 dark:border-slate-800 pt-6">
           <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
             3. Tanda Tangan Elektronik Pengaju <span className="text-red-500 ml-0.5">*</span>
@@ -1176,8 +1176,8 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
       </div>
 
       {/* Footer Form */}
-      <div className="bg-slate-50 border-t border-slate-200 px-6 py-4 flex items-center justify-between">
-        <div className="text-xs text-slate-400 hidden sm:block flex items-center">
+      <div className="bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between">
+        <div className="text-xs text-slate-400 dark:text-slate-500 hidden sm:block flex items-center">
           <ClipboardCheck className="w-4 h-4 mr-1 text-slate-400 inline" /> Seluruh data terenkripsi SHA-256.
         </div>
         <button

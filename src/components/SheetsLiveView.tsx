@@ -130,19 +130,19 @@ export default function SheetsLiveView({ documents, onRefresh, isLoading }: Shee
   );
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs" id="sheets-live-view">
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs" id="sheets-live-view">
       {/* Google Sheets Header Mockup */}
-      <div className="bg-slate-50 border-b border-slate-200 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <div className="bg-emerald-600 text-white p-1.5 rounded-lg">
             <Database className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+            <h3 className="text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
               Database_Serah_Terima.xlsx 
-              <span className="bg-emerald-100 text-emerald-800 text-[9px] px-1.5 py-0.2 rounded-full font-bold">Google Sheets</span>
+              <span className="bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-400 text-[9px] px-1.5 py-0.2 rounded-full font-bold">Google Sheets</span>
             </h3>
-            <p className="text-[10px] text-slate-400">Basis data tersinkronisasi otomatis setiap kali ada pembaruan status berkas.</p>
+            <p className="text-[10px] text-slate-400 dark:text-slate-500">Basis data tersinkronisasi otomatis setiap kali ada pembaruan status berkas.</p>
           </div>
         </div>
         
@@ -156,7 +156,7 @@ export default function SheetsLiveView({ documents, onRefresh, isLoading }: Shee
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               id="sheet-search-input"
-              className="text-xs border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 w-44 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 bg-white"
+              className="text-xs border border-slate-200 dark:border-slate-700 rounded-lg pl-8 pr-3 py-1.5 w-44 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 bg-white dark:bg-slate-850 text-slate-800 dark:text-slate-100"
             />
           </div>
 
@@ -164,7 +164,7 @@ export default function SheetsLiveView({ documents, onRefresh, isLoading }: Shee
             onClick={onRefresh}
             disabled={isLoading}
             id="btn-refresh-sheets"
-            className="p-1.5 bg-white hover:bg-slate-50 text-slate-600 rounded-lg border border-slate-200 transition disabled:opacity-50 cursor-pointer"
+            className="p-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg border border-slate-200 dark:border-slate-700 transition disabled:opacity-50 cursor-pointer"
             title="Refresh database"
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
@@ -174,40 +174,40 @@ export default function SheetsLiveView({ documents, onRefresh, isLoading }: Shee
 
       {/* Spreadsheet Grid */}
       <div className="overflow-x-auto spreadsheet-scrollbar pb-1">
-        <table className="w-full text-left border-collapse" style={{ minWidth: "1550px" }}>
+        <table className="w-full text-left border-collapse" style={{ minWidth: "1850px" }}>
           <thead>
-            <tr className="bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
-              <th className="px-3 py-2.5 border-r border-slate-200 w-10 text-center">No</th>
-              <th className="px-4 py-2.5 border-r border-slate-200">Kode Berkas (ID)</th>
-              <th className="px-4 py-2.5 border-r border-slate-200 min-w-[450px]">Judul Berkas / Deskripsi</th>
-              <th className="px-4 py-2.5 border-r border-slate-200">Kategori</th>
-              <th className="px-4 py-2.5 border-r border-slate-200">Pengaju (Staff)</th>
-              <th className="px-4 py-2.5 border-r border-slate-200">Penerima</th>
-              <th className="px-4 py-2.5 border-r border-slate-200">Atasan Penyetuju</th>
-              <th className="px-4 py-2.5 border-r border-slate-200">TTD Admin</th>
-              <th className="px-4 py-2.5 border-r border-slate-200">TTD Atasan</th>
-              <th className="px-4 py-2.5 border-r border-slate-200 text-center">Status</th>
-              <th className="px-4 py-2.5 text-center">Aksi</th>
+            <tr className="bg-slate-100 dark:bg-slate-850 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
+              <th className="px-3 py-2.5 border-r border-slate-200 dark:border-slate-800 w-10 text-center">No</th>
+              <th className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800">Kode Berkas (ID)</th>
+              <th className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800 min-w-[450px]">Judul Berkas / Deskripsi</th>
+              <th className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800">Kategori</th>
+              <th className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800">Pengaju (Staff)</th>
+              <th className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800">Penerima</th>
+              <th className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800">Atasan Penyetuju</th>
+              <th className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800">TTD Admin</th>
+              <th className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800">TTD Atasan</th>
+              <th className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800 text-center">Status</th>
+              <th className="px-4 py-2.5 text-center w-[120px] min-w-[120px]">Aksi</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200 font-mono text-[11px] text-slate-600">
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-800 font-mono text-[11px] text-slate-600 dark:text-slate-300">
             {filteredDocs.length === 0 ? (
               <tr>
-                <td colSpan={11} className="text-center py-8 text-slate-400 bg-slate-50/50">
+                <td colSpan={11} className="text-center py-8 text-slate-400 bg-slate-50/50 dark:bg-slate-900/50">
                   Tidak ada data baris database yang sesuai.
                 </td>
               </tr>
             ) : (
               filteredDocs.map((doc, idx) => (
-                <tr key={doc.id} className="hover:bg-slate-50/80 transition-colors">
-                  <td className="px-3 py-2.5 border-r border-slate-200 text-center bg-slate-50 text-slate-400 font-bold">{idx + 1}</td>
-                  <td className="px-4 py-2.5 border-r border-slate-200 font-bold text-indigo-600">{doc.verificationCode}</td>
-                  <td className="px-4 py-2.5 border-r border-slate-200 font-sans min-w-[450px]">
-                    <span className="font-bold text-slate-800 block text-xs">{doc.title}</span>
+                <tr key={doc.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+                  <td className="px-3 py-2.5 border-r border-slate-200 dark:border-slate-800 text-center bg-slate-50 dark:bg-slate-900/50 text-slate-400 font-bold">{idx + 1}</td>
+                  <td className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800 font-bold text-indigo-600 dark:text-indigo-400">{doc.verificationCode}</td>
+                  <td className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800 font-sans min-w-[450px]">
+                    <span className="font-bold text-slate-800 dark:text-slate-100 block text-xs">{doc.title}</span>
                     <span className="text-[10px] text-slate-400 block mt-0.5 whitespace-normal leading-relaxed">{doc.description}</span>
                     {doc.items && doc.items.length > 0 && (
-                      <div className="mt-2 pt-2 border-t border-slate-100 space-y-1 bg-slate-50 p-2 rounded-md">
-                        <span className="text-[9px] font-black text-indigo-700 block uppercase tracking-wider">Rincian Kegiatan:</span>
+                      <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1 bg-slate-50 dark:bg-slate-950 p-2 rounded-md">
+                        <span className="text-[9px] font-black text-indigo-700 dark:text-indigo-400 block uppercase tracking-wider">Rincian Kegiatan:</span>
                         {doc.items.map((item, index) => {
                           const isUnchecked = item.includes(" - Ditangguhkan");
                           const cleanItem = isUnchecked ? item.replace(" - Ditangguhkan", "") : item;
@@ -228,12 +228,12 @@ export default function SheetsLiveView({ documents, onRefresh, isLoading }: Shee
                           }
                           
                           return (
-                            <div key={index} className="text-[9px] text-slate-600 font-mono whitespace-normal leading-relaxed mt-1">
-                              <span className={`font-bold ${isUnchecked ? 'line-through text-red-500' : 'text-slate-700'}`}>
+                            <div key={index} className="text-[9px] text-slate-600 dark:text-slate-400 font-mono whitespace-normal leading-relaxed mt-1">
+                              <span className={`font-bold ${isUnchecked ? 'line-through text-red-500' : 'text-slate-700 dark:text-slate-300'}`}>
                                 {index + 1}. {itemTitle}
                               </span>
                               {itemDetail && (
-                                <span className={`block pl-3 text-slate-500 ${isUnchecked ? 'line-through' : ''}`}>
+                                <span className={`block pl-3 text-slate-500 dark:text-slate-400 ${isUnchecked ? 'line-through' : ''}`}>
                                   {itemDetail}
                                 </span>
                               )}
@@ -243,31 +243,31 @@ export default function SheetsLiveView({ documents, onRefresh, isLoading }: Shee
                       </div>
                     )}
                   </td>
-                  <td className="px-4 py-2.5 border-r border-slate-200 font-sans text-[11px]">{doc.category}</td>
-                  <td className="px-4 py-2.5 border-r border-slate-200 font-sans">
-                    <div className="font-semibold text-slate-700">{doc.senderName}</div>
-                    <div className="text-[9px] text-slate-400">{doc.senderEmail}</div>
+                  <td className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800 font-sans text-[11px] dark:text-slate-300">{doc.category}</td>
+                  <td className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800 font-sans">
+                    <div className="font-semibold text-slate-700 dark:text-slate-300">{doc.senderName}</div>
+                    <div className="text-[9px] text-slate-400 dark:text-slate-500">{doc.senderEmail}</div>
                   </td>
-                  <td className="px-4 py-2.5 border-r border-slate-200 font-sans">
-                    <div className="font-semibold text-slate-700">{doc.recipientName}</div>
-                    <div className="text-[9px] text-slate-400">{doc.recipientEmail}</div>
+                  <td className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800 font-sans">
+                    <div className="font-semibold text-slate-700 dark:text-slate-300">{doc.recipientName}</div>
+                    <div className="text-[9px] text-slate-400 dark:text-slate-500">{doc.recipientEmail}</div>
                   </td>
-                  <td className="px-4 py-2.5 border-r border-slate-200 font-sans text-xs font-semibold text-slate-700">{doc.supervisorName}</td>
-                  <td className="px-4 py-2.5 border-r border-slate-200 text-center">
+                  <td className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800 font-sans text-xs font-semibold text-slate-700 dark:text-slate-300">{doc.supervisorName}</td>
+                  <td className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800 text-center">
                     {doc.adminSignature ? (
-                      <span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">SIGNED</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-100 dark:border-emerald-900/50">SIGNED</span>
                     ) : (
-                      <span className="text-slate-400">PENDING</span>
+                      <span className="text-slate-400 dark:text-slate-500">PENDING</span>
                     )}
                   </td>
-                  <td className="px-4 py-2.5 border-r border-slate-200 text-center">
+                  <td className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800 text-center">
                     {doc.supervisorSignature ? (
-                      <span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">SIGNED</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-100 dark:border-emerald-900/50">SIGNED</span>
                     ) : (
-                      <span className="text-slate-400">PENDING</span>
+                      <span className="text-slate-400 dark:text-slate-500">PENDING</span>
                     )}
                   </td>
-                  <td className="px-4 py-2.5 border-r border-slate-200 text-center font-sans">
+                  <td className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800 text-center font-sans">
                     <motion.span
                       key={doc.status}
                       initial={{ scale: 0.8, opacity: 0 }}
@@ -275,12 +275,12 @@ export default function SheetsLiveView({ documents, onRefresh, isLoading }: Shee
                       transition={{ type: "spring", stiffness: 350, damping: 15 }}
                       className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ring-1 ring-offset-0 ${
                         doc.status === "completed" 
-                          ? "bg-emerald-100 text-emerald-800 ring-emerald-300/30"
+                          ? "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 ring-emerald-300/30 dark:ring-emerald-800/40"
                           : doc.status === "rejected"
-                          ? "bg-red-100 text-red-800 ring-red-300/30"
+                          ? "bg-red-100 dark:bg-red-950/40 text-red-800 dark:text-red-400 ring-red-300/30 dark:ring-red-800/40"
                           : doc.status === "pending_atasan"
-                          ? "bg-amber-100 text-amber-800 ring-amber-300/30"
-                          : "bg-indigo-100 text-indigo-800 ring-indigo-300/30"
+                          ? "bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-400 ring-amber-300/30 dark:ring-amber-800/40"
+                          : "bg-indigo-100 dark:bg-indigo-950/40 text-indigo-800 dark:text-indigo-400 ring-indigo-300/30 dark:ring-indigo-800/40"
                       }`}
                     >
                       {doc.status === "completed" 
@@ -296,14 +296,14 @@ export default function SheetsLiveView({ documents, onRefresh, isLoading }: Shee
                     <div className="flex items-center justify-center gap-1.5">
                       <button
                         onClick={() => handleStartEdit(doc)}
-                        className="p-1.5 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 rounded-lg transition border border-slate-200 hover:border-indigo-200 cursor-pointer"
+                        className="p-1.5 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 hover:text-indigo-700 rounded-lg transition border border-slate-200 dark:border-slate-800 hover:border-indigo-200 cursor-pointer"
                         title="Edit Berkas"
                       >
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleStartDelete(doc)}
-                        className="p-1.5 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition border border-slate-200 hover:border-red-200 cursor-pointer"
+                        className="p-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 hover:text-red-700 rounded-lg transition border border-slate-200 dark:border-slate-800 hover:border-red-200 cursor-pointer"
                         title="Hapus Berkas"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -318,7 +318,7 @@ export default function SheetsLiveView({ documents, onRefresh, isLoading }: Shee
       </div>
 
       {/* Spreadsheet Status Bar */}
-      <div className="bg-slate-100 border-t border-slate-200 px-4 py-2 flex items-center justify-between text-[10px] text-slate-500 font-medium">
+      <div className="bg-slate-100 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 px-4 py-2 flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 font-medium">
         <div>Menampilkan {filteredDocs.length} baris data tersinkronisasi.</div>
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
