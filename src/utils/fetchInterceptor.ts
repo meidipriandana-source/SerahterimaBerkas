@@ -27,15 +27,15 @@ function getSeedData() {
 
   const doc2: DocumentHandover = {
     id: "doc-102",
-    title: "Berkas Kontrak Vendor Cloud AWS",
-    description: "Dokumen fisik kontrak sewa server AWS Enterprise Cloud Tier selama 12 bulan.",
+    title: "Berkas Kontrak Vendor Penyedia Jasa",
+    description: "Dokumen fisik kontrak kerjasama sewa jasa operasional kantor RSUD selama 12 bulan.",
     category: "Kontrak & Kerjasama",
     timestamp: new Date(Date.now() - 2 * 3600 * 1000).toISOString(), // 2 hours ago
     senderName: "Meidi Priandana",
     senderEmail: "meidipriandana@gmail.com",
     senderSignature: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='50'><path d='M10,25 Q30,10 50,25 T90,25' stroke='black' stroke-width='2' fill='none'/></svg>",
-    recipientName: "AWS Indonesia Sales",
-    recipientEmail: "sales@aws.co.id",
+    recipientName: "CV Sinar Abadi (Vendor Jasa)",
+    recipientEmail: "sales@sinarabadi.co.id",
     supervisorName: "dr. Budy Azis B, Sp.PK.,M.H.",
     supervisorEmail: "budy.azis@company.com",
     supervisorSignature: null,
@@ -108,17 +108,17 @@ function getSeedData() {
         id: "log-4",
         timestamp: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
         documentId: "doc-102",
-        documentTitle: "Berkas Kontrak Vendor AWS",
+        documentTitle: "Berkas Kontrak Vendor Penyedia Jasa",
         actor: "Meidi Priandana",
         role: "staff" as const,
         action: "Pengajuan Serah Terima",
-        details: "Mengajukan berkas kontrak vendor AWS"
+        details: "Mengajukan berkas kontrak vendor penyedia jasa"
       },
       {
         id: "log-5",
         timestamp: new Date(Date.now() - 1.8 * 3600 * 1000).toISOString(),
         documentId: "doc-102",
-        documentTitle: "Berkas Kontrak Vendor AWS",
+        documentTitle: "Berkas Kontrak Vendor Penyedia Jasa",
         actor: "Sistem Admin",
         role: "admin" as const,
         action: "Verifikasi & Tanda Tangan",
@@ -148,7 +148,7 @@ function getSeedData() {
         id: "notif-2",
         timestamp: new Date(Date.now() - 1.8 * 3600 * 1000).toISOString(),
         title: "Pemberitahuan Approval",
-        message: "Dokumen AWS Kontrak telah ditandatangani Admin dan diteruskan ke Atasan dr. Budy Azis B, Sp.PK.,M.H.",
+        message: "Dokumen Berkas Kontrak Vendor Jasa telah ditandatangani Admin dan diteruskan ke Atasan dr. Budy Azis B, Sp.PK.,M.H.",
         documentId: "doc-102",
         read: false
       }
@@ -194,19 +194,7 @@ function getLocalDB() {
       docChanged = true;
     }
     
-    // Auto-fix description if it is still using the AWS default but category/title says SPJ Diklat / Pelatihan / BHD
-    if (updatedDoc.description === "Dokumen fisik kontrak sewa server AWS Enterprise Cloud Tier selama 12 bulan.") {
-      if (updatedDoc.category === "SPJ Diklat" || updatedDoc.title.toLowerCase().includes("pelatihan") || updatedDoc.title.toLowerCase().includes("bhd") || updatedDoc.title.toLowerCase().includes("diklat") || updatedDoc.title.toLowerCase().includes("spj")) {
-        updatedDoc.description = "Berkas laporan pertanggungjawaban (SPJ) kegiatan diklat dan pelatihan, meliputi berkas kelengkapan administrasi, surat tugas, sertifikat, rincian biaya, dan dokumentasi pelaksanaan kegiatan.";
-        docChanged = true;
-      } else if (updatedDoc.category === "Telaah Diklat/Pelatihan") {
-        updatedDoc.description = "Dokumen telaah staf pengajuan diklat/pelatihan eksternal bagi pegawai RSUD.";
-        docChanged = true;
-      } else if (updatedDoc.category === "SK (Surat Keputusan)") {
-        updatedDoc.description = "Dokumen Surat Keputusan (SK) resmi direksi terkait tugas belajar dan pelatihan pegawai.";
-        docChanged = true;
-      }
-    }
+    // No auto-fixing descriptions anymore to prevent corruption of user data
     
     if (docChanged) {
       modified = true;

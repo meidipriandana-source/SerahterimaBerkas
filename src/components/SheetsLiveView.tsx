@@ -173,8 +173,8 @@ export default function SheetsLiveView({ documents, onRefresh, isLoading }: Shee
       </div>
 
       {/* Spreadsheet Grid */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse" style={{ minWidth: "1400px" }}>
+      <div className="overflow-x-auto spreadsheet-scrollbar pb-1">
+        <table className="w-full text-left border-collapse" style={{ minWidth: "1550px" }}>
           <thead>
             <tr className="bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
               <th className="px-3 py-2.5 border-r border-slate-200 w-10 text-center">No</th>
@@ -205,6 +205,43 @@ export default function SheetsLiveView({ documents, onRefresh, isLoading }: Shee
                   <td className="px-4 py-2.5 border-r border-slate-200 font-sans min-w-[450px]">
                     <span className="font-bold text-slate-800 block text-xs">{doc.title}</span>
                     <span className="text-[10px] text-slate-400 block mt-0.5 whitespace-normal leading-relaxed">{doc.description}</span>
+                    {doc.items && doc.items.length > 0 && (
+                      <div className="mt-2 pt-2 border-t border-slate-100 space-y-1 bg-slate-50 p-2 rounded-md">
+                        <span className="text-[9px] font-black text-indigo-700 block uppercase tracking-wider">Rincian Kegiatan:</span>
+                        {doc.items.map((item, index) => {
+                          const isUnchecked = item.includes(" - Ditangguhkan");
+                          const cleanItem = isUnchecked ? item.replace(" - Ditangguhkan", "") : item;
+                          
+                          // Parse item title and details
+                          let itemTitle = cleanItem;
+                          let itemDetail = "";
+                          const categoryMatch = cleanItem.match(/^(.+?)\s*\[([^\]]+)\](?:\s*-\s*(.*))?$/);
+                          if (categoryMatch) {
+                            itemTitle = categoryMatch[1].trim();
+                            itemDetail = categoryMatch[3] ? categoryMatch[3].trim() : "";
+                          } else {
+                            const descIndex = cleanItem.indexOf(" - ");
+                            if (descIndex !== -1) {
+                              itemTitle = cleanItem.substring(0, descIndex).trim();
+                              itemDetail = cleanItem.substring(descIndex + 3).trim();
+                            }
+                          }
+                          
+                          return (
+                            <div key={index} className="text-[9px] text-slate-600 font-mono whitespace-normal leading-relaxed mt-1">
+                              <span className={`font-bold ${isUnchecked ? 'line-through text-red-500' : 'text-slate-700'}`}>
+                                {index + 1}. {itemTitle}
+                              </span>
+                              {itemDetail && (
+                                <span className={`block pl-3 text-slate-500 ${isUnchecked ? 'line-through' : ''}`}>
+                                  {itemDetail}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </td>
                   <td className="px-4 py-2.5 border-r border-slate-200 font-sans text-[11px]">{doc.category}</td>
                   <td className="px-4 py-2.5 border-r border-slate-200 font-sans">

@@ -64,15 +64,15 @@ function seedDbIfEmpty(db: any) {
 
     const doc2: DocumentHandover = {
       id: "doc-102",
-      title: "Berkas Kontrak Vendor Cloud AWS",
-      description: "Dokumen fisik kontrak sewa server AWS Enterprise Cloud Tier selama 12 bulan.",
+      title: "Berkas Kontrak Vendor Penyedia Jasa",
+      description: "Dokumen fisik kontrak kerjasama sewa jasa operasional kantor RSUD selama 12 bulan.",
       category: "Kontrak & Kerjasama",
       timestamp: new Date(Date.now() - 2 * 3600 * 1000).toISOString(), // 2 hours ago
       senderName: "Meidi Priandana",
       senderEmail: "meidipriandana@gmail.com",
       senderSignature: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='50'><path d='M10,25 Q30,10 50,25 T90,25' stroke='black' stroke-width='2' fill='none'/></svg>",
-      recipientName: "AWS Indonesia Sales",
-      recipientEmail: "sales@aws.co.id",
+      recipientName: "CV Sinar Abadi (Vendor Jasa)",
+      recipientEmail: "sales@sinarabadi.co.id",
       supervisorName: "Aripuddin Maskur, S.E.,M.M",
       supervisorEmail: "aripuddin.maskur@company.com",
       supervisorSignature: null,
@@ -146,17 +146,17 @@ function seedDbIfEmpty(db: any) {
         id: "log-4",
         timestamp: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
         documentId: "doc-102",
-        documentTitle: "Berkas Kontrak Vendor AWS",
+        documentTitle: "Berkas Kontrak Vendor Penyedia Jasa",
         actor: "Meidi Priandana",
         role: "staff",
         action: "Pengajuan Serah Terima",
-        details: "Mengajukan berkas kontrak vendor AWS"
+        details: "Mengajukan berkas kontrak vendor penyedia jasa"
       },
       {
         id: "log-5",
         timestamp: new Date(Date.now() - 1.8 * 3600 * 1000).toISOString(),
         documentId: "doc-102",
-        documentTitle: "Berkas Kontrak Vendor AWS",
+        documentTitle: "Berkas Kontrak Vendor Penyedia Jasa",
         actor: "Sistem Admin",
         role: "admin",
         action: "Verifikasi & Tanda Tangan",
@@ -187,7 +187,7 @@ function seedDbIfEmpty(db: any) {
         id: "notif-2",
         timestamp: new Date(Date.now() - 1.8 * 3600 * 1000).toISOString(),
         title: "Pemberitahuan Approval",
-        message: "Dokumen AWS Kontrak telah ditandatangani Admin dan diteruskan ke Atasan Aripuddin Maskur, S.E.,M.M.",
+        message: "Dokumen Berkas Kontrak Vendor Jasa telah ditandatangani Admin dan diteruskan ke Atasan Aripuddin Maskur, S.E.,M.M.",
         documentId: "doc-102",
         read: false
       }

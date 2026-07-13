@@ -18,7 +18,6 @@ const HARDCODED_SUPERVISORS = [
 export default function HandoverForm({ onSuccessSubmit, triggerPushNotification, documents = [] }: HandoverFormProps) {
   // Hardcoded recipient positions
   const recipientPositions = [
-    { name: "AWS Indonesia Sales", email: "sales@aws.co.id" },
     { name: "Sekretaris Direktur", email: "sekretaris.direktur@company.com" },
     { name: "Sekretaris Wadir", email: "sekretaris.wadir@company.com" },
     { name: "Kabag", email: "kabag@company.com" },
@@ -29,20 +28,19 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
 
   // Hardcoded recipient persons
   const recipientPersons = [
-    { name: "AWS Indonesia Sales", email: "sales@aws.co.id" },
     { name: "Aina Mardiana", email: "aina.mardiana@company.com" },
     { name: "Wafiq Khalifatul Azizah, SKM.,M.Kes", email: "wafiq.khalifatul@company.com" }
   ];
 
   // Form fields
-  const [title, setTitle] = useState(() => localStorage.getItem("handover_form_title") || "Berkas Kontrak Vendor Cloud AWS");
-  const [description, setDescription] = useState(() => localStorage.getItem("handover_form_description") || "Dokumen fisik kontrak sewa server AWS Enterprise Cloud Tier selama 12 bulan.");
+  const [title, setTitle] = useState(() => localStorage.getItem("handover_form_title") || "Berkas Kontrak Vendor Penyedia Jasa");
+  const [description, setDescription] = useState(() => localStorage.getItem("handover_form_description") || "Dokumen fisik kontrak kerjasama sewa jasa operasional kantor RSUD selama 12 bulan.");
   const [category, setCategory] = useState(() => localStorage.getItem("handover_form_category") || "Kontrak & Kerjasama");
   const [senderName, setSenderName] = useState(() => localStorage.getItem("handover_form_senderName") || "Meidi Priandana");
   const [senderEmail, setSenderEmail] = useState(() => localStorage.getItem("handover_form_senderEmail") || "meidipriandana@gmail.com");
-  const [recipientName, setRecipientName] = useState(() => localStorage.getItem("handover_form_recipientName") || "AWS Indonesia Sales");
-  const [recipientPersonName, setRecipientPersonName] = useState(() => localStorage.getItem("handover_form_recipientPersonName") || "AWS Indonesia Sales");
-  const [recipientEmail, setRecipientEmail] = useState(() => localStorage.getItem("handover_form_recipientEmail") || "sales@aws.co.id");
+  const [recipientName, setRecipientName] = useState(() => localStorage.getItem("handover_form_recipientName") || "Sekretaris Direktur");
+  const [recipientPersonName, setRecipientPersonName] = useState(() => localStorage.getItem("handover_form_recipientPersonName") || "Aina Mardiana");
+  const [recipientEmail, setRecipientEmail] = useState(() => localStorage.getItem("handover_form_recipientEmail") || "aina.mardiana@company.com");
   
   const [supervisor1, setSupervisor1] = useState(() => {
     const saved = localStorage.getItem("handover_form_supervisor1");
@@ -477,19 +475,43 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                   const val = e.target.value;
                   setCategory(val);
                   
-                  // Dynamically adjust title and description based on selected category to prevent mismatch
-                  if (val === "SPJ Diklat") {
-                    setTitle("Laporan SPJ Kegiatan Pelatihan & Diklat");
-                    setDescription("Berkas laporan pertanggungjawaban (SPJ) kegiatan diklat dan pelatihan, meliputi berkas kelengkapan administrasi, surat tugas, sertifikat, rincian biaya, dan dokumentasi pelaksanaan kegiatan.");
-                  } else if (val === "Telaah Diklat/Pelatihan") {
-                    setTitle("Telaah Staf Pengajuan Diklat Eksternal");
-                    setDescription("Dokumen telaah staf pengajuan diklat/pelatihan eksternal bagi pegawai RSUD.");
-                  } else if (val === "SK (Surat Keputusan)") {
-                    setTitle("Surat Keputusan (SK) Tugas Belajar / Pelatihan");
-                    setDescription("Dokumen Surat Keputusan (SK) resmi direksi terkait tugas belajar dan pelatihan pegawai.");
-                  } else if (val === "Kontrak & Kerjasama") {
-                    setTitle("Berkas Kontrak Vendor Cloud AWS");
-                    setDescription("Dokumen fisik kontrak sewa server AWS Enterprise Cloud Tier selama 12 bulan.");
+                  // Dynamically adjust title and description based on selected category only if they are blank or set to a default preset
+                  const isTitleDefault = !title.trim() || [
+                    "Laporan SPJ Kegiatan Pelatihan & Diklat",
+                    "Telaah Staf Pengajuan Diklat Eksternal",
+                    "Surat Keputusan (SK) Tugas Belajar / Pelatihan",
+                    "Berkas Kontrak Vendor Penyedia Jasa"
+                  ].includes(title.trim());
+                  
+                  const isDescDefault = !description.trim() || [
+                    "Berkas laporan pertanggungjawaban (SPJ) kegiatan diklat dan pelatihan, meliputi berkas kelengkapan administrasi, surat tugas, sertifikat, rincian biaya, dan dokumentasi pelaksanaan kegiatan.",
+                    "Dokumen telaah staf pengajuan diklat/pelatihan eksternal bagi pegawai RSUD.",
+                    "Dokumen Surat Keputusan (SK) resmi direksi terkait tugas belajar dan pelatihan pegawai.",
+                    "Dokumen fisik kontrak kerjasama sewa jasa operasional kantor RSUD selama 12 bulan."
+                  ].includes(description.trim());
+
+                  if (isTitleDefault) {
+                    if (val === "SPJ Diklat") {
+                      setTitle("Laporan SPJ Kegiatan Pelatihan & Diklat");
+                    } else if (val === "Telaah Diklat/Pelatihan") {
+                      setTitle("Telaah Staf Pengajuan Diklat Eksternal");
+                    } else if (val === "SK (Surat Keputusan)") {
+                      setTitle("Surat Keputusan (SK) Tugas Belajar / Pelatihan");
+                    } else if (val === "Kontrak & Kerjasama") {
+                      setTitle("Berkas Kontrak Vendor Penyedia Jasa");
+                    }
+                  }
+
+                  if (isDescDefault) {
+                    if (val === "SPJ Diklat") {
+                      setDescription("Berkas laporan pertanggungjawaban (SPJ) kegiatan diklat dan pelatihan, meliputi berkas kelengkapan administrasi, surat tugas, sertifikat, rincian biaya, dan dokumentasi pelaksanaan kegiatan.");
+                    } else if (val === "Telaah Diklat/Pelatihan") {
+                      setDescription("Dokumen telaah staf pengajuan diklat/pelatihan eksternal bagi pegawai RSUD.");
+                    } else if (val === "SK (Surat Keputusan)") {
+                      setDescription("Dokumen Surat Keputusan (SK) resmi direksi terkait tugas belajar dan pelatihan pegawai.");
+                    } else if (val === "Kontrak & Kerjasama") {
+                      setDescription("Dokumen fisik kontrak kerjasama sewa jasa operasional kantor RSUD selama 12 bulan.");
+                    }
                   }
                 }}
                 id="form-select-category"

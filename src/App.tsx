@@ -387,7 +387,7 @@ export default function App() {
 
             {/* Content Panel Box */}
             <main className="flex-1 p-4 overflow-y-auto max-w-full bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
-              <div className="max-w-6xl mx-auto space-y-5">
+              <div className={`${activeTab === "sheets" || activeTab === "drive" ? "max-w-[98%] 2xl:max-w-[1700px]" : "max-w-6xl"} mx-auto space-y-5 transition-all duration-300`}>
                 
                 {/* Role-Based Access Control Simulator Switcher */}
                 <RoleSelector 
