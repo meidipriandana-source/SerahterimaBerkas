@@ -280,7 +280,7 @@ export default function App() {
                   onClick={() => handleToggleDarkMode(!isDarkMode)}
                   id="btn-quick-theme-toggle"
                   title={isDarkMode ? "Aktifkan Mode Terang" : "Aktifkan Mode Gelap"}
-                  className="p-2 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl transition cursor-pointer flex items-center justify-center"
+                  className="p-2 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl transition cursor-pointer flex items-center justify-center"
                 >
                   {isDarkMode ? (
                     <Sun className="w-4 h-4 text-amber-500" />
@@ -296,7 +296,7 @@ export default function App() {
                   className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-[9px] font-black uppercase transition-all duration-300 cursor-pointer ${
                     workspaceConfig.connected 
                       ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900 hover:bg-emerald-100 dark:hover:bg-emerald-950/50" 
-                      : "bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-750"
+                      : "bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700"
                   }`}
                 >
                   <span className={`w-2 h-2 rounded-full ${

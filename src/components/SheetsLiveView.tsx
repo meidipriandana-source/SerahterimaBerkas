@@ -156,7 +156,7 @@ export default function SheetsLiveView({ documents, onRefresh, isLoading }: Shee
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               id="sheet-search-input"
-              className="text-xs border border-slate-200 dark:border-slate-700 rounded-lg pl-8 pr-3 py-1.5 w-44 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 bg-white dark:bg-slate-850 text-slate-800 dark:text-slate-100"
+              className="text-xs border border-slate-200 dark:border-slate-700 rounded-lg pl-8 pr-3 py-1.5 w-44 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
             />
           </div>
 
@@ -176,7 +176,7 @@ export default function SheetsLiveView({ documents, onRefresh, isLoading }: Shee
       <div className="overflow-x-auto spreadsheet-scrollbar pb-1">
         <table className="w-full text-left border-collapse" style={{ minWidth: "1850px" }}>
           <thead>
-            <tr className="bg-slate-100 dark:bg-slate-850 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
+            <tr className="bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
               <th className="px-3 py-2.5 border-r border-slate-200 dark:border-slate-800 w-10 text-center">No</th>
               <th className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800">Kode Berkas (ID)</th>
               <th className="px-4 py-2.5 border-r border-slate-200 dark:border-slate-800 min-w-[450px]">Judul Berkas / Deskripsi</th>

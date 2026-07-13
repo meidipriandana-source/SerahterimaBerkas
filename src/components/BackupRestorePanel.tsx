@@ -401,7 +401,7 @@ export default function BackupRestorePanel({
             </p>
           </div>
 
-          <div className="bg-slate-50/70 dark:bg-slate-950/50 border border-slate-100 dark:border-slate-850/60 rounded-xl p-3.5 space-y-2 text-[11px] text-slate-500">
+          <div className="bg-slate-50/70 dark:bg-slate-950/50 border border-slate-100 dark:border-slate-800/60 rounded-xl p-3.5 space-y-2 text-[11px] text-slate-500">
             <div className="flex items-center gap-2 font-semibold text-slate-600 dark:text-slate-400">
               <Info className="w-3.5 h-3.5 text-indigo-500" />
               <span>Cakupan File Cadangan:</span>

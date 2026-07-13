@@ -358,7 +358,7 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               id="drive-search-input"
-              className="text-xs border border-slate-200 dark:border-slate-700 rounded-lg pl-8 pr-3 py-1.5 w-44 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 bg-white dark:bg-slate-850 text-slate-800 dark:text-slate-100"
+              className="text-xs border border-slate-200 dark:border-slate-700 rounded-lg pl-8 pr-3 py-1.5 w-44 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
             />
           </div>
 
@@ -531,7 +531,7 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
                       className={`w-5 h-5 rounded border flex items-center justify-center transition cursor-pointer shadow-3xs ${
                         isSelected 
                           ? "bg-indigo-600 border-indigo-600 text-white" 
-                          : "bg-white/90 dark:bg-slate-800 border-slate-300 dark:border-slate-750 text-transparent hover:border-indigo-500"
+                          : "bg-white/90 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-transparent hover:border-indigo-500"
                       }`}
                       title={isSelected ? "Batal pilih berkas" : "Contreng / Pilih berkas"}
                     >
@@ -796,7 +796,7 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
                   setNewFolderName(e.target.value);
                   setCreateFolderError("");
                 }}
-                className="w-full text-xs border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white dark:bg-slate-850 text-slate-800 dark:text-slate-100"
+                className="w-full text-xs border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
                 autoFocus
               />
               <p className="text-[9px] text-slate-400 mt-1">Spasi akan otomatis diubah menjadi karakter underscore (_)</p>
@@ -850,7 +850,7 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
               <button
                 type="button"
                 onClick={() => handleExecuteMove(null)}
-                className="w-full text-left px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center justify-between transition cursor-pointer"
+                className="w-full text-left px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center justify-between transition cursor-pointer"
               >
                 <span className="flex items-center gap-2">
                   <Folder className="w-4 h-4 text-slate-400" />
@@ -865,7 +865,7 @@ export default function DriveLiveView({ documents, onRefresh, isLoading }: Drive
                   key={folder.id}
                   type="button"
                   onClick={() => handleExecuteMove(folder.id)}
-                  className="w-full text-left px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-indigo-50/50 dark:hover:bg-slate-850 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center justify-between transition cursor-pointer"
+                  className="w-full text-left px-4 py-3 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-indigo-50/50 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center justify-between transition cursor-pointer"
                 >
                   <span className="flex items-center gap-2">
                     <Folder className="w-4 h-4 text-amber-500 fill-amber-100" />

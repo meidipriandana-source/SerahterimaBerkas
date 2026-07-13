@@ -270,7 +270,7 @@ export default function SignaturePad({
 
   return (
     <div className="w-full">
-      <div className="relative border border-slate-300 rounded-lg overflow-hidden bg-slate-50 shadow-inner">
+      <div className="relative border border-slate-300 dark:border-slate-700 rounded-lg overflow-hidden bg-slate-50 dark:bg-slate-800 shadow-inner">
         <AnimatePresence>
           {showSavedAlert && (
             <motion.div
@@ -280,7 +280,7 @@ export default function SignaturePad({
               transition={{ type: "spring", stiffness: 220, damping: 18 }}
               className="absolute inset-0 bg-emerald-500/10 backdrop-blur-[1px] flex items-center justify-center pointer-events-none z-10"
             >
-              <div className="bg-white/95 shadow-md border border-emerald-200/60 px-4 py-2 rounded-full flex items-center gap-2">
+              <div className="bg-white/95 dark:bg-slate-900/95 shadow-md border border-emerald-200/60 dark:border-emerald-800/60 px-4 py-2 rounded-full flex items-center gap-2">
                 <motion.div
                   initial={{ rotate: -45, scale: 0.5 }}
                   animate={{ rotate: 0, scale: 1 }}
@@ -289,14 +289,14 @@ export default function SignaturePad({
                 >
                   <CheckCircle className="w-4 h-4" />
                 </motion.div>
-                <span className="text-xs font-black text-emerald-700 tracking-wide">Tanda Tangan Tersimpan!</span>
+                <span className="text-xs font-black text-emerald-700 dark:text-emerald-400 tracking-wide">Tanda Tangan Tersimpan!</span>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
         {isEmpty && (
-          <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none text-slate-400 text-xs sm:text-sm text-center">
+          <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none text-slate-400 dark:text-slate-500 text-xs sm:text-sm text-center">
             <PenTool className="w-4 h-4 mr-2 stroke-1" />
             {placeholder}
           </div>
@@ -321,7 +321,7 @@ export default function SignaturePad({
             type="button"
             onClick={() => clearCanvas(true)}
             id="clear-signature-btn"
-            className="flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-600 px-2.5 py-1 text-xs font-semibold rounded-md transition shadow-sm border border-slate-200"
+            className="flex items-center gap-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 px-2.5 py-1 text-xs font-semibold rounded-md transition shadow-sm border border-slate-200 dark:border-slate-600"
           >
             <Trash2 className="w-3.5 h-3.5" />
             Clear

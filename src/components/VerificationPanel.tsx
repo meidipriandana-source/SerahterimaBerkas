@@ -73,7 +73,7 @@ export default function VerificationPanel({ documents }: VerificationPanelProps)
               value={code}
               onChange={(e) => setCode(e.target.value)}
               id="verification-code-input"
-              className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded-lg pl-10 pr-3 py-2.5 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 placeholder-slate-400 dark:placeholder-slate-500 transition bg-white dark:bg-slate-850 text-slate-800 dark:text-slate-100"
+              className="w-full text-xs border border-slate-300 dark:border-slate-700 rounded-lg pl-10 pr-3 py-2.5 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 placeholder-slate-400 dark:placeholder-slate-500 transition bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
             />
           </div>
           <button
@@ -94,7 +94,7 @@ export default function VerificationPanel({ documents }: VerificationPanelProps)
                 key={doc.id}
                 type="button"
                 onClick={() => handleSelectPredefined(doc.verificationCode)}
-                className="bg-slate-100 dark:bg-slate-850 hover:bg-slate-200 dark:hover:bg-slate-750 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-750 px-2 py-0.5 rounded-sm transition cursor-pointer font-mono"
+                className="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700 px-2 py-0.5 rounded-sm transition cursor-pointer font-mono"
               >
                 {doc.verificationCode}
               </button>

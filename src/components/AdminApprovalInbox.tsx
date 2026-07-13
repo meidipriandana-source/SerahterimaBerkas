@@ -338,7 +338,7 @@ export default function AdminApprovalInbox({
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all border ${
                   isMultiSelect
                     ? "bg-indigo-50 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400"
-                    : "bg-slate-50 dark:bg-slate-850 hover:bg-slate-100 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
+                    : "bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
                 } cursor-pointer`}
               >
                 <CheckSquare className="w-3.5 h-3.5" />
@@ -901,7 +901,7 @@ export default function AdminApprovalInbox({
               </button>
             </div>
 
-            <div className="space-y-1 bg-slate-50 dark:bg-slate-950/40 p-3 rounded-xl border border-slate-100 dark:border-slate-850 text-xs text-left">
+            <div className="space-y-1 bg-slate-50 dark:bg-slate-950/40 p-3 rounded-xl border border-slate-100 dark:border-slate-800 text-xs text-left">
               <span className="text-[9px] font-bold text-slate-400 uppercase">Judul Berkas</span>
               <p className="font-bold text-slate-800 dark:text-slate-100">{swipeApproveDoc.title}</p>
               <div className="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-slate-200/40 text-[10px] text-slate-500">
@@ -1012,7 +1012,7 @@ export default function AdminApprovalInbox({
               </button>
             </div>
 
-            <div className="space-y-1 bg-slate-50 dark:bg-slate-950/40 p-3 rounded-xl border border-slate-100 dark:border-slate-850 text-xs text-left">
+            <div className="space-y-1 bg-slate-50 dark:bg-slate-950/40 p-3 rounded-xl border border-slate-100 dark:border-slate-800 text-xs text-left">
               <span className="text-[9px] font-bold text-slate-400 uppercase">Judul Berkas</span>
               <p className="font-bold text-slate-800 dark:text-slate-100">{swipeRejectDoc.title}</p>
             </div>

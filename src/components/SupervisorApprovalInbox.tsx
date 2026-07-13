@@ -679,7 +679,7 @@ export default function SupervisorApprovalInbox({
                 </button>
               </div>
 
-              <div className="space-y-1 bg-slate-50 dark:bg-slate-950/40 p-3 rounded-xl border border-slate-100 dark:border-slate-850 text-xs text-left">
+              <div className="space-y-1 bg-slate-50 dark:bg-slate-950/40 p-3 rounded-xl border border-slate-100 dark:border-slate-800 text-xs text-left">
                 <span className="text-[9px] font-bold text-slate-400 uppercase">Judul Berkas</span>
                 <p className="font-bold text-slate-800 dark:text-slate-100">{swipeApproveDoc.title}</p>
                 <div className="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-slate-200/40 text-[10px] text-slate-500">
@@ -797,7 +797,7 @@ export default function SupervisorApprovalInbox({
               </button>
             </div>
 
-            <div className="space-y-1 bg-slate-50 dark:bg-slate-950/40 p-3 rounded-xl border border-slate-100 dark:border-slate-850 text-xs text-left">
+            <div className="space-y-1 bg-slate-50 dark:bg-slate-950/40 p-3 rounded-xl border border-slate-100 dark:border-slate-800 text-xs text-left">
               <span className="text-[9px] font-bold text-slate-400 uppercase">Judul Berkas</span>
               <p className="font-bold text-slate-800 dark:text-slate-100">{swipeRejectDoc.title}</p>
             </div>
