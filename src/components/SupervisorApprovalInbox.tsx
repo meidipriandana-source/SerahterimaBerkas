@@ -104,7 +104,9 @@ export default function SupervisorApprovalInbox({
 
       // Clear signature pad
       setSupervisorSignature("");
-      setSelectedDoc(null);
+      if (remainingUnsigned.length === 0) {
+        setSelectedDoc(null);
+      }
       onActionComplete();
     } catch (err) {
       console.error(err);
@@ -167,7 +169,7 @@ export default function SupervisorApprovalInbox({
       }
 
       setSwipeApproveDoc(null);
-      if (selectedDoc?.id === doc.id) {
+      if (selectedDoc?.id === doc.id && remainingUnsigned.length === 0) {
         setSelectedDoc(null);
       }
       onActionComplete();

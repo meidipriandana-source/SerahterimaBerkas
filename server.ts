@@ -314,7 +314,7 @@ async function startServer() {
     const randomHex2 = Math.random().toString(16).substring(2, 6).toUpperCase();
     const verificationCode = `ST-${randomHex}-${randomHex2}`;
 
-    const individualSupervisors = supervisorName ? supervisorName.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
+    const individualSupervisors = supervisorName ? supervisorName.split(";").map((s: string) => s.trim()).filter(Boolean) : [];
     const supervisorSignatures: Record<string, string | null> = {};
     individualSupervisors.forEach((sup: string) => {
       supervisorSignatures[sup] = null;
@@ -475,7 +475,7 @@ async function startServer() {
       doc.supervisorSignatures = {};
     }
 
-    const sups = doc.supervisorName ? doc.supervisorName.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
+    const sups = doc.supervisorName ? doc.supervisorName.split(";").map((s: string) => s.trim()).filter(Boolean) : [];
     
     // Determine the name of the signing supervisor. 
     // If none is provided, default to the first supervisor in the list or the only supervisor.
@@ -924,7 +924,7 @@ async function startServer() {
       if (recipientEmail !== undefined) doc.recipientEmail = recipientEmail;
       if (supervisorName !== undefined) {
         doc.supervisorName = supervisorName;
-        const individualSupervisors = supervisorName.split(",").map((s: string) => s.trim()).filter(Boolean);
+        const individualSupervisors = supervisorName.split(";").map((s: string) => s.trim()).filter(Boolean);
         const supervisorSignatures: Record<string, string | null> = {};
         individualSupervisors.forEach((sup: string) => {
           supervisorSignatures[sup] = doc.supervisorSignatures?.[sup] || null;

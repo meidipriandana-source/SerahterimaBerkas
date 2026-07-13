@@ -176,13 +176,6 @@ export async function exportDocumentToPDF(doc: DocumentHandover): Promise<void> 
         </div>
       </div>
 
-      <!-- Core Content Details -->
-      <div style="margin-bottom: 25px; border-top: 1px solid #f1f5f9; padding-top: 20px;">
-        <h3 style="margin: 0 0 8px 0; font-size: 14px; font-weight: 900; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">Detail Serah Terima:</h3>
-        <div style="font-size: 13px; font-weight: bold; color: #4338ca; margin-bottom: 8px;">${doc.title}</div>
-        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; font-size: 12px; line-height: 1.6; color: #334155; white-space: pre-wrap; min-height: 60px;">${doc.description}</div>
-      </div>
-
       <!-- Items Table -->
       ${itemsHtml}
 
@@ -486,13 +479,6 @@ export function generateDocumentHTML(doc: DocumentHandover): string {
             <span style="font-size: 12px; font-weight: 700; color: #0f172a; display: block;">${doc.recipientName}</span>
             <span style="font-size: 10px; color: #64748b;">${doc.recipientEmail}</span>
           </div>
-        </div>
-
-        <!-- Core Content Details -->
-        <div style="margin-bottom: 25px; border-top: 1px solid #f1f5f9; padding-top: 20px;">
-          <h3 style="margin: 0 0 8px 0; font-size: 14px; font-weight: 900; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">Detail Serah Terima:</h3>
-          <div style="font-size: 13px; font-weight: bold; color: #4338ca; margin-bottom: 8px;">${doc.title}</div>
-          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; font-size: 12px; line-height: 1.6; color: #334155; white-space: pre-wrap; min-height: 60px;">${doc.description}</div>
         </div>
 
         <!-- Items Table -->

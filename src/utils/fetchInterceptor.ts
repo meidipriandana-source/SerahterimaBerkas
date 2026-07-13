@@ -567,7 +567,7 @@ export function setupFetchInterceptor() {
             if (body.recipientEmail !== undefined) doc.recipientEmail = body.recipientEmail;
             if (body.supervisorName !== undefined) {
               doc.supervisorName = body.supervisorName;
-              const individualSupervisors = body.supervisorName.split(",").map((s: string) => s.trim()).filter(Boolean);
+              const individualSupervisors = body.supervisorName.split(";").map((s: string) => s.trim()).filter(Boolean);
               const supervisorSignatures: Record<string, string | null> = {};
               individualSupervisors.forEach((sup: string) => {
                 supervisorSignatures[sup] = doc.supervisorSignatures?.[sup] || null;
