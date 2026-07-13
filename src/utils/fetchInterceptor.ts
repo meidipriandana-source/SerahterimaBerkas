@@ -184,13 +184,33 @@ function getLocalDB() {
       return name;
     });
     const newSupName = validParts.join("; ");
+    
+    let updatedDoc = { ...doc };
+    let docChanged = false;
+    
     if (newSupName !== doc.supervisorName) {
+      updatedDoc.supervisorName = newSupName;
+      updatedDoc.supervisorEmail = doc.supervisorEmail ? doc.supervisorEmail.replace("hendra", "budy.azis") : "budy.azis@company.com";
+      docChanged = true;
+    }
+    
+    // Auto-fix description if it is still using the AWS default but category/title says SPJ Diklat / Pelatihan / BHD
+    if (updatedDoc.description === "Dokumen fisik kontrak sewa server AWS Enterprise Cloud Tier selama 12 bulan.") {
+      if (updatedDoc.category === "SPJ Diklat" || updatedDoc.title.toLowerCase().includes("pelatihan") || updatedDoc.title.toLowerCase().includes("bhd") || updatedDoc.title.toLowerCase().includes("diklat") || updatedDoc.title.toLowerCase().includes("spj")) {
+        updatedDoc.description = "Berkas laporan pertanggungjawaban (SPJ) kegiatan diklat dan pelatihan, meliputi berkas kelengkapan administrasi, surat tugas, sertifikat, rincian biaya, dan dokumentasi pelaksanaan kegiatan.";
+        docChanged = true;
+      } else if (updatedDoc.category === "Telaah Diklat/Pelatihan") {
+        updatedDoc.description = "Dokumen telaah staf pengajuan diklat/pelatihan eksternal bagi pegawai RSUD.";
+        docChanged = true;
+      } else if (updatedDoc.category === "SK (Surat Keputusan)") {
+        updatedDoc.description = "Dokumen Surat Keputusan (SK) resmi direksi terkait tugas belajar dan pelatihan pegawai.";
+        docChanged = true;
+      }
+    }
+    
+    if (docChanged) {
       modified = true;
-      return {
-        ...doc,
-        supervisorName: newSupName,
-        supervisorEmail: doc.supervisorEmail ? doc.supervisorEmail.replace("hendra", "budy.azis") : "budy.azis@company.com"
-      };
+      return updatedDoc;
     }
     return doc;
   });

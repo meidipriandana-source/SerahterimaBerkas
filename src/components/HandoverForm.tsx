@@ -473,7 +473,25 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
               <label className="text-xs font-bold text-slate-700">Kategori Berkas</label>
               <select
                 value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setCategory(val);
+                  
+                  // Dynamically adjust title and description based on selected category to prevent mismatch
+                  if (val === "SPJ Diklat") {
+                    setTitle("Laporan SPJ Kegiatan Pelatihan & Diklat");
+                    setDescription("Berkas laporan pertanggungjawaban (SPJ) kegiatan diklat dan pelatihan, meliputi berkas kelengkapan administrasi, surat tugas, sertifikat, rincian biaya, dan dokumentasi pelaksanaan kegiatan.");
+                  } else if (val === "Telaah Diklat/Pelatihan") {
+                    setTitle("Telaah Staf Pengajuan Diklat Eksternal");
+                    setDescription("Dokumen telaah staf pengajuan diklat/pelatihan eksternal bagi pegawai RSUD.");
+                  } else if (val === "SK (Surat Keputusan)") {
+                    setTitle("Surat Keputusan (SK) Tugas Belajar / Pelatihan");
+                    setDescription("Dokumen Surat Keputusan (SK) resmi direksi terkait tugas belajar dan pelatihan pegawai.");
+                  } else if (val === "Kontrak & Kerjasama") {
+                    setTitle("Berkas Kontrak Vendor Cloud AWS");
+                    setDescription("Dokumen fisik kontrak sewa server AWS Enterprise Cloud Tier selama 12 bulan.");
+                  }
+                }}
                 id="form-select-category"
                 className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 transition bg-white"
               >
