@@ -272,15 +272,12 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
         finalItems.push(itemLabel);
       }
     } else {
-      const hasAnyChecked = items.some(item => checkedItems[item]?.returned);
-      if (!hasAnyChecked) {
+      const checkedList = items.filter(item => checkedItems[item]?.returned);
+      if (checkedList.length === 0) {
         alert("Harap contreng/pilih minimal 1 berkas dalam daftar untuk dikirim!");
         return;
       }
-      finalItems = items.map(item => {
-        const isChecked = checkedItems[item]?.returned;
-        return isChecked ? item : `${item} - Ditangguhkan`;
-      });
+      finalItems = checkedList;
     }
 
     if (finalItems.length === 0) {
@@ -356,7 +353,13 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
       setRecipientPersonName("Aina Mardiana");
       setRecipientEmail("aina.mardiana@company.com");
       setSenderSignature("");
-      setItems([]);
+      
+      if (items.length > 0) {
+        const remainingItems = items.filter(item => !checkedItems[item]?.returned);
+        setItems(remainingItems);
+      } else {
+        setItems([]);
+      }
     } catch (error) {
       console.error("Submit error:", error);
       alert("Terjadi kesalahan saat memproses data. Silakan coba lagi.");

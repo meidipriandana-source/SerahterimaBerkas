@@ -21,6 +21,11 @@ export default function AdminApprovalInbox({
   const [showRejectForm, setShowRejectForm] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Multi select states
+  const [isMultiSelect, setIsMultiSelect] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [batchProgress, setBatchProgress] = useState<{ current: number; total: number; mode: "approve" | "reject" | null }>({ current: 0, total: 0, mode: null });
+
   // Swipe Action states
   const [swipeApproveDoc, setSwipeApproveDoc] = useState<DocumentHandover | null>(null);
   const [swipeRejectDoc, setSwipeRejectDoc] = useState<DocumentHandover | null>(null);
@@ -113,6 +118,126 @@ export default function AdminApprovalInbox({
     }
   };
 
+  const handleBatchApprove = async () => {
+    const signatureToUse = savedAdminSignature || adminSignature;
+    if (!signatureToUse) {
+      alert("Harap bubuhkan atau pilih tanda tangan terlebih dahulu!");
+      return;
+    }
+
+    if (!confirm(`Apakah Anda yakin ingin menyetujui ${selectedIds.length} berkas sekaligus?`)) {
+      return;
+    }
+
+    setIsProcessing(true);
+    setBatchProgress({ current: 0, total: selectedIds.length, mode: "approve" });
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (let i = 0; i < selectedIds.length; i++) {
+      const docId = selectedIds[i];
+      const doc = pendingDocs.find(d => d.id === docId);
+      if (!doc) continue;
+
+      setBatchProgress({ current: i + 1, total: selectedIds.length, mode: "approve" });
+
+      try {
+        const res = await fetch(`/api/documents/${docId}/admin-sign`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ adminSignature: signatureToUse })
+        });
+
+        if (res.ok) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } catch (err) {
+        console.error(`Gagal memproses persetujuan berkas ID: ${docId}`, err);
+        failCount++;
+      }
+    }
+
+    setIsProcessing(false);
+    setBatchProgress({ current: 0, total: 0, mode: null });
+
+    // Save signature if drawn and set to remember
+    if (rememberSignature && adminSignature) {
+      localStorage.setItem("saved_admin_signature", adminSignature);
+      setSavedAdminSignature(adminSignature);
+    }
+
+    triggerPushNotification(
+      "Persetujuan Massal Selesai",
+      `Berhasil menyetujui ${successCount} berkas.${failCount > 0 ? ` Gagal: ${failCount} berkas.` : ""}`
+    );
+
+    setSelectedIds([]);
+    setIsMultiSelect(false);
+    onActionComplete();
+  };
+
+  const handleBatchReject = async () => {
+    if (!rejectReason.trim()) {
+      alert("Harap isi alasan penolakan!");
+      return;
+    }
+
+    if (!confirm(`Apakah Anda yakin ingin menolak ${selectedIds.length} berkas sekaligus?`)) {
+      return;
+    }
+
+    setIsProcessing(true);
+    setBatchProgress({ current: 0, total: selectedIds.length, mode: "reject" });
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (let i = 0; i < selectedIds.length; i++) {
+      const docId = selectedIds[i];
+      const doc = pendingDocs.find(d => d.id === docId);
+      if (!doc) continue;
+
+      setBatchProgress({ current: i + 1, total: selectedIds.length, mode: "reject" });
+
+      try {
+        const res = await fetch(`/api/documents/${docId}/reject`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            role: "admin",
+            actor: "Sistem Admin",
+            reason: rejectReason
+          })
+        });
+
+        if (res.ok) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } catch (err) {
+        console.error(`Gagal memproses penolakan berkas ID: ${docId}`, err);
+        failCount++;
+      }
+    }
+
+    setIsProcessing(false);
+    setBatchProgress({ current: 0, total: 0, mode: null });
+    setRejectReason("");
+
+    triggerPushNotification(
+      "Penolakan Massal Selesai",
+      `Berhasil menolak ${successCount} berkas.${failCount > 0 ? ` Gagal: ${failCount} berkas.` : ""}`
+    );
+
+    setSelectedIds([]);
+    setIsMultiSelect(false);
+    onActionComplete();
+  };
+
 
   const handleAdminSign = async () => {
     if (!selectedDoc) return;
@@ -193,17 +318,57 @@ export default function AdminApprovalInbox({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" id="admin-inbox-panel">
       {/* Pending List Area */}
-      <div className={`lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs flex flex-col h-[500px] ${selectedDoc ? "hidden lg:flex" : "flex"}`}>
-        <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-4 py-3 border-b border-slate-200 dark:border-slate-800 shrink-0">
-          <h3 className="text-xs font-bold uppercase tracking-wider flex items-center justify-between">
-            <span>Antrean Verifikasi Admin</span>
-            <span className="bg-indigo-600 dark:bg-indigo-500 text-white px-2 py-0.5 rounded-full font-bold text-[10px]">
-              {pendingDocs.length} Berkas
-            </span>
-          </h3>
+      <div className={`lg:col-span-1 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs flex flex-col h-[500px] ${(isMultiSelect || selectedDoc) ? "hidden lg:flex" : "flex"}`}>
+        <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-4 py-3 border-b border-slate-200 dark:border-slate-800 shrink-0 flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+              <span>Antrean Verifikasi Admin</span>
+              <span className="bg-indigo-600 dark:bg-indigo-500 text-white px-2 py-0.5 rounded-full font-bold text-[10px]">
+                {pendingDocs.length} Berkas
+              </span>
+            </h3>
+            {pendingDocs.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMultiSelect(!isMultiSelect);
+                  setSelectedIds([]);
+                  setSelectedDoc(null);
+                }}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all border ${
+                  isMultiSelect
+                    ? "bg-indigo-50 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400"
+                    : "bg-slate-50 dark:bg-slate-850 hover:bg-slate-100 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
+                } cursor-pointer`}
+              >
+                <CheckSquare className="w-3.5 h-3.5" />
+                <span>{isMultiSelect ? "Batal" : "Pilih Banyak"}</span>
+              </button>
+            )}
+          </div>
+          {isMultiSelect && pendingDocs.length > 0 && (
+            <div className="flex items-center gap-2 pt-1.5 border-t border-slate-100 dark:border-slate-800/60 justify-between">
+              <button
+                type="button"
+                onClick={() => {
+                  if (selectedIds.length === pendingDocs.length) {
+                    setSelectedIds([]);
+                  } else {
+                    setSelectedIds(pendingDocs.map((doc) => doc.id));
+                  }
+                }}
+                className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
+              >
+                {selectedIds.length === pendingDocs.length ? "Batal Pilih Semua" : "Pilih Semua"}
+              </button>
+              <span className="text-[10px] font-mono text-slate-500 font-bold">
+                {selectedIds.length} Terpilih
+              </span>
+            </div>
+          )}
         </div>
 
-        {pendingDocs.length > 0 && (
+        {pendingDocs.length > 0 && !isMultiSelect && (
           <div className="bg-indigo-50/50 dark:bg-indigo-950/20 px-4 py-2 border-b border-slate-100 dark:border-slate-800/80 flex items-center gap-2 text-[10px] text-indigo-700 dark:text-indigo-300 shrink-0">
             <Info className="w-3.5 h-3.5 shrink-0 text-indigo-500" />
             <span>💡 <strong>Tip Cepat:</strong> Geser kartu ke <strong>Kanan (Setuju)</strong> atau ke <strong>Kiri (Tolak)</strong> untuk proses kilat.</span>
@@ -225,6 +390,69 @@ export default function AdminApprovalInbox({
                 hour: "2-digit",
                 minute: "2-digit"
               });
+
+              const isChecked = selectedIds.includes(doc.id);
+
+              if (isMultiSelect) {
+                return (
+                  <div
+                    key={doc.id}
+                    onClick={() => {
+                      if (isChecked) {
+                        setSelectedIds(prev => prev.filter(id => id !== doc.id));
+                      } else {
+                        setSelectedIds(prev => [...prev, doc.id]);
+                      }
+                    }}
+                    className={`relative p-3.5 rounded-xl border transition-all cursor-pointer select-none my-1.5 flex items-start gap-3 text-left ${
+                      isChecked
+                        ? "bg-indigo-50/40 dark:bg-indigo-950/20 border-indigo-500 dark:border-indigo-500"
+                        : "bg-white dark:bg-slate-900 border-slate-200/85 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
+                    }`}
+                  >
+                    <div className="pt-0.5" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedIds(prev => [...prev, doc.id]);
+                          } else {
+                            setSelectedIds(prev => prev.filter(id => id !== doc.id));
+                          }
+                        }}
+                        className="w-4 h-4 rounded text-indigo-600 border-slate-300 dark:border-slate-700 focus:ring-indigo-500 cursor-pointer"
+                      />
+                    </div>
+
+                    <div className="flex-1 flex flex-col gap-1 text-left">
+                      <div className="flex justify-between items-center text-[9px] text-slate-400 dark:text-slate-500">
+                        <span className="font-mono bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 px-1.5 py-0.5 rounded font-bold">{doc.verificationCode}</span>
+                        <span>{formattedDate}</span>
+                      </div>
+                      
+                      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 line-clamp-1">{doc.title}</h4>
+                      
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[9px] bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded-full font-bold">
+                          {doc.category}
+                        </span>
+                      </div>
+
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 space-y-0.5 font-medium border-t border-dashed border-slate-100 dark:border-slate-800/80 pt-1.5 mt-1.5">
+                        <div className="flex items-center gap-1">
+                          <span className="text-slate-400 dark:text-slate-500 w-12 shrink-0">Pengaju:</span> 
+                          <span className="text-slate-700 dark:text-slate-300 font-semibold line-clamp-1">{doc.senderName}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span className="text-slate-400 dark:text-slate-500 w-12 shrink-0">Atasan:</span> 
+                          <span className="text-slate-700 dark:text-slate-300 font-semibold line-clamp-1">{doc.supervisorName}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
 
               return (
                 <SwipeableApprovalItem
@@ -276,8 +504,148 @@ export default function AdminApprovalInbox({
       </div>
 
       {/* Detail & Action Area */}
-      <div className={`lg:col-span-2 bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs flex flex-col min-h-[500px] ${!selectedDoc ? "hidden lg:flex" : "flex"}`}>
-        {selectedDoc ? (
+      <div className={`lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs flex flex-col min-h-[500px] ${(isMultiSelect || selectedDoc) ? "flex" : "hidden lg:flex"}`}>
+        {isMultiSelect ? (
+          /* Multi Select Batch Action Panel */
+          <div className="p-6 space-y-6 flex-1 overflow-y-auto text-left" id="admin-batch-panel">
+            <div className="border-b border-slate-100 dark:border-slate-800 pb-4">
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                <CheckSquare className="w-5 h-5 text-indigo-600" />
+                <span>Panel Aksi Massal Admin (Batch Action)</span>
+              </h3>
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">
+                Lakukan verifikasi tanda tangan massal atau penolakan sekaligus untuk beberapa dokumen terpilih.
+              </p>
+            </div>
+
+            {selectedIds.length === 0 ? (
+              <div className="flex-1 flex flex-col items-center justify-center text-center text-slate-400 dark:text-slate-500 py-16">
+                <ClipboardCheck className="w-12 h-12 text-slate-200 dark:text-slate-800 mb-2 stroke-1" />
+                <p className="font-bold text-slate-700 dark:text-slate-300 text-xs">Belum Ada Dokumen Terpilih</p>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 max-w-xs mt-1">
+                  Harap centang satu atau beberapa dokumen di daftar antrean sebelah kiri untuk memulai aksi persetujuan atau penolakan massal.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* Selected documents titles */}
+                <div className="space-y-2">
+                  <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-wide">
+                    Daftar Dokumen Terpilih ({selectedIds.length})
+                  </span>
+                  <div className="max-h-36 overflow-y-auto border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/55 dark:bg-slate-950/20 p-3 space-y-1.5">
+                    {pendingDocs.filter(d => selectedIds.includes(d.id)).map((doc, idx) => (
+                      <div key={doc.id} className="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300 py-1 border-b border-slate-100 dark:border-slate-900 last:border-b-0">
+                        <span className="truncate pr-4">{idx + 1}. {doc.title}</span>
+                        <span className="text-[9px] font-mono bg-slate-200/60 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded shrink-0">
+                          {doc.verificationCode}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Batch approval & batch reject sections */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-slate-100 dark:border-slate-800/80 pt-5">
+                  {/* Batch Approve Box */}
+                  <div className="space-y-4 bg-emerald-50/10 dark:bg-emerald-950/5 border border-emerald-100 dark:border-emerald-900/30 p-4 rounded-xl flex flex-col justify-between">
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-bold text-emerald-800 dark:text-emerald-400 flex items-center gap-1.5 uppercase tracking-wider">
+                        <Check className="w-4 h-4 text-emerald-600" /> 1. Setujui Massal (Batch Approve)
+                      </h4>
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500">
+                        Seluruh dokumen yang dipilih akan ditandatangani sekaligus menggunakan tanda tangan elektronik Admin Anda.
+                      </p>
+
+                      {savedAdminSignature ? (
+                        <div className="space-y-2.5 pt-1">
+                          <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 block uppercase">Tanda Tangan Tersimpan Anda:</span>
+                          <div className="border border-emerald-200/50 dark:border-emerald-800/50 rounded-xl bg-white dark:bg-slate-950 p-2 flex items-center justify-center relative">
+                            <img src={savedAdminSignature} alt="Tanda tangan tersimpan" className="h-16 object-contain" />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-2 pt-1">
+                          <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 block uppercase">Gambarlah Tanda Tangan Anda:</span>
+                          <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-950">
+                            <SignaturePad
+                              onSave={(sig) => {
+                                setAdminSignature(sig);
+                              }}
+                              onClear={() => setAdminSignature("")}
+                              placeholder="Tanda tangan massal Anda..."
+                              height={100}
+                              initialValue={adminSignature}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="pt-4">
+                      <button
+                        type="button"
+                        onClick={handleBatchApprove}
+                        disabled={isProcessing || (!savedAdminSignature && !adminSignature)}
+                        className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 transition cursor-pointer disabled:cursor-not-allowed shadow-xs"
+                      >
+                        {isProcessing && batchProgress.mode === "approve" ? (
+                          <span>Memproses ({batchProgress.current}/{batchProgress.total})...</span>
+                        ) : (
+                          <>
+                            <Check className="w-4 h-4" />
+                            <span>Setujui {selectedIds.length} Berkas</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Batch Reject Box */}
+                  <div className="space-y-4 bg-rose-50/10 dark:bg-rose-950/5 border border-rose-100 dark:border-rose-900/30 p-4 rounded-xl flex flex-col justify-between">
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-bold text-rose-800 dark:text-rose-400 flex items-center gap-1.5 uppercase tracking-wider">
+                        <XOctagon className="w-4 h-4 text-rose-600" /> 2. Tolak Massal (Batch Reject)
+                      </h4>
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500">
+                        Seluruh dokumen terpilih akan ditolak bersamaan dengan satu alasan penolakan yang sama di bawah ini.
+                      </p>
+
+                      <div className="space-y-1 pt-1 text-left">
+                        <label className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase">Alasan Penolakan Bersama <span className="text-red-500">*</span></label>
+                        <textarea
+                          rows={3}
+                          placeholder="Tuliskan alasan penolakan massal..."
+                          value={rejectReason}
+                          onChange={(e) => setRejectReason(e.target.value)}
+                          className="w-full text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100 rounded-lg px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-rose-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="pt-4">
+                      <button
+                        type="button"
+                        onClick={handleBatchReject}
+                        disabled={isProcessing || !rejectReason.trim()}
+                        className="w-full py-2 bg-red-600 hover:bg-red-700 disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 transition cursor-pointer disabled:cursor-not-allowed shadow-xs"
+                      >
+                        {isProcessing && batchProgress.mode === "reject" ? (
+                          <span>Memproses ({batchProgress.current}/{batchProgress.total})...</span>
+                        ) : (
+                          <>
+                            <XOctagon className="w-4 h-4" />
+                            <span>Tolak {selectedIds.length} Berkas</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : selectedDoc ? (
           <div className="p-6 space-y-5 flex-1 overflow-y-auto" id="admin-doc-details">
             {/* Mobile Back Button */}
             <button 
