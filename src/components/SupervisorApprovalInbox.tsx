@@ -401,19 +401,57 @@ export default function SupervisorApprovalInbox({
                 <p className="text-slate-700 leading-relaxed font-sans mt-0.5">{selectedDoc.description}</p>
               </div>
               {selectedDoc.items && selectedDoc.items.length > 0 && (
-                <div className="sm:col-span-2 border-t border-slate-200/60 pt-2.5">
-                  <span className="text-indigo-600 block font-black text-[9px] uppercase tracking-wide mb-1.5">Rincian Berkas yang Diserahkan ({selectedDoc.items.length})</span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="sm:col-span-2 border-t border-slate-200/60 pt-3">
+                  <span className="text-indigo-600 block font-black text-[9.5px] uppercase tracking-wider mb-2.5">Rincian Berkas yang Diserahkan per Kegiatan ({selectedDoc.items.length})</span>
+                  <div className="grid grid-cols-1 gap-3">
                     {selectedDoc.items.map((item, idx) => {
                       const isUnchecked = item.includes(" - Ditangguhkan");
                       const cleanItemName = isUnchecked ? item.replace(" - Ditangguhkan", "") : item;
+
+                      let itemTitle = cleanItemName;
+                      let itemCategory = "Umum";
+                      let itemDetail = "";
+
+                      const categoryMatch = cleanItemName.match(/^(.+?)\s*\[([^\]]+)\](?:\s*-\s*(.*))?$/);
+                      if (categoryMatch) {
+                        itemTitle = categoryMatch[1].trim();
+                        itemCategory = categoryMatch[2].trim();
+                        itemDetail = categoryMatch[3] ? categoryMatch[3].trim() : "";
+                      } else {
+                        const descIndex = cleanItemName.indexOf(" - ");
+                        if (descIndex !== -1) {
+                          itemTitle = cleanItemName.substring(0, descIndex).trim();
+                          itemDetail = cleanItemName.substring(descIndex + 3).trim();
+                        }
+                      }
+
                       return (
-                        <div key={idx} className={`border rounded-md px-2.5 py-1.5 text-xs font-semibold shadow-3xs flex justify-between items-center transition-all ${isUnchecked ? 'bg-slate-50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 line-through decoration-slate-300 dark:decoration-slate-700 italic opacity-75' : 'bg-white dark:bg-slate-800/80 border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-200'}`}>
-                          <span>{idx + 1}. {cleanItemName}</span>
-                          {isUnchecked && (
-                            <span className="text-[8px] font-black bg-red-100/70 dark:bg-red-950/40 text-red-700 dark:text-red-400 border border-red-200/50 dark:border-red-900/30 px-1.5 py-0.5 rounded uppercase tracking-wider scale-95 origin-right shrink-0">
-                              Ditangguhkan
+                        <div 
+                          key={idx} 
+                          className={`border rounded-xl p-3.5 shadow-2xs transition-all flex flex-col gap-2 ${
+                            isUnchecked 
+                              ? 'bg-slate-50/50 dark:bg-slate-900/20 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500' 
+                              : 'bg-white dark:bg-slate-800/80 border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-200'
+                          }`}
+                        >
+                          <div className="flex justify-between items-start gap-3">
+                            <span className={`text-xs font-bold text-slate-800 dark:text-slate-200 ${isUnchecked ? 'line-through opacity-60' : ''}`}>
+                              {idx + 1}. {itemTitle}
                             </span>
+                            <span 
+                              className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider border shrink-0 ${
+                                isUnchecked 
+                                  ? 'bg-red-50 text-red-600 border-red-100 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30' 
+                                  : 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30'
+                              }`}
+                            >
+                              {isUnchecked ? `DITANGGUHKAN (${itemCategory})` : itemCategory}
+                            </span>
+                          </div>
+                          {itemDetail && (
+                            <div className={`text-[11px] leading-relaxed bg-slate-50 dark:bg-slate-950/50 p-2.5 rounded-lg border border-slate-100 dark:border-slate-800/60 text-slate-600 dark:text-slate-300 ${isUnchecked ? 'opacity-50 line-through' : ''}`}>
+                              {itemDetail}
+                            </div>
                           )}
                         </div>
                       );

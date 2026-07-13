@@ -174,12 +174,12 @@ export default function SheetsLiveView({ documents, onRefresh, isLoading }: Shee
 
       {/* Spreadsheet Grid */}
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse" style={{ minWidth: "1100px" }}>
+        <table className="w-full text-left border-collapse" style={{ minWidth: "1400px" }}>
           <thead>
             <tr className="bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
               <th className="px-3 py-2.5 border-r border-slate-200 w-10 text-center">No</th>
               <th className="px-4 py-2.5 border-r border-slate-200">Kode Berkas (ID)</th>
-              <th className="px-4 py-2.5 border-r border-slate-200">Judul Berkas / Deskripsi</th>
+              <th className="px-4 py-2.5 border-r border-slate-200 min-w-[450px]">Judul Berkas / Deskripsi</th>
               <th className="px-4 py-2.5 border-r border-slate-200">Kategori</th>
               <th className="px-4 py-2.5 border-r border-slate-200">Pengaju (Staff)</th>
               <th className="px-4 py-2.5 border-r border-slate-200">Penerima</th>
@@ -202,9 +202,9 @@ export default function SheetsLiveView({ documents, onRefresh, isLoading }: Shee
                 <tr key={doc.id} className="hover:bg-slate-50/80 transition-colors">
                   <td className="px-3 py-2.5 border-r border-slate-200 text-center bg-slate-50 text-slate-400 font-bold">{idx + 1}</td>
                   <td className="px-4 py-2.5 border-r border-slate-200 font-bold text-indigo-600">{doc.verificationCode}</td>
-                  <td className="px-4 py-2.5 border-r border-slate-200 font-sans">
+                  <td className="px-4 py-2.5 border-r border-slate-200 font-sans min-w-[450px]">
                     <span className="font-bold text-slate-800 block text-xs">{doc.title}</span>
-                    <span className="text-[10px] text-slate-400 line-clamp-1">{doc.description}</span>
+                    <span className="text-[10px] text-slate-400 block mt-0.5 whitespace-normal leading-relaxed">{doc.description}</span>
                   </td>
                   <td className="px-4 py-2.5 border-r border-slate-200 font-sans text-[11px]">{doc.category}</td>
                   <td className="px-4 py-2.5 border-r border-slate-200 font-sans">

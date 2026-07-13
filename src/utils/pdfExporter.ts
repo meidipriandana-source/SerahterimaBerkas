@@ -38,43 +38,56 @@ export async function exportDocumentToPDF(doc: DocumentHandover): Promise<void> 
   if (doc.items && doc.items.length > 0) {
     itemsHtml = `
       <div style="margin-top: 20px; margin-bottom: 25px;">
-        <h4 style="margin: 0 0 10px 0; font-size: 13px; font-weight: 800; color: #4338ca; text-transform: uppercase; letter-spacing: 0.5px;">Daftar Barang / Berkas Serah Terima:</h4>
-        <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
-          <thead>
-            <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
-              <th style="padding: 8px 12px; font-weight: bold; color: #334155; width: 40px;">No</th>
-              <th style="padding: 8px 12px; font-weight: bold; color: #334155;">Deskripsi Item</th>
-              <th style="padding: 8px 12px; font-weight: bold; color: #334155; width: 100px; text-align: right;">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${doc.items.map((item, index) => {
-              const isUnchecked = item.includes(" - Ditangguhkan");
-              const cleanItem = isUnchecked ? item.replace(" - Ditangguhkan", "") : item;
-              const parts = cleanItem.split(" [");
-              const title = parts[0] || cleanItem;
-              const categoryDesc = parts[1] ? parts[1].replace("]", "") : "Umum";
-              
-              const badgeBg = isUnchecked ? "#fee2e2" : "#ecfdf5";
-              const badgeColor = isUnchecked ? "#991b1b" : "#065f46";
-              const labelStatus = isUnchecked ? `Ditangguhkan (${categoryDesc})` : categoryDesc;
-              const rowStyle = isUnchecked ? "border-bottom: 1px solid #e2e8f0; background-color: #fafafa; opacity: 0.75;" : "border-bottom: 1px solid #e2e8f0;";
-              const textStyle = isUnchecked ? "padding: 8px 12px; font-weight: 600; color: #64748b; text-decoration: line-through;" : "padding: 8px 12px; font-weight: 600; color: #0f172a;";
+        <h4 style="margin: 0 0 12px 0; font-size: 13px; font-weight: 800; color: #4338ca; text-transform: uppercase; letter-spacing: 0.5px;">Rincian Serah Terima Per Kegiatan:</h4>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          ${doc.items.map((item, index) => {
+            const isUnchecked = item.includes(" - Ditangguhkan");
+            const cleanItem = isUnchecked ? item.replace(" - Ditangguhkan", "") : item;
+            
+            // Parse item title, category, and detail
+            let itemTitle = cleanItem;
+            let itemCategory = "Umum";
+            let itemDetail = "";
 
-              return `
-                <tr style="${rowStyle}">
-                  <td style="padding: 8px 12px; color: #94a3b8;">${index + 1}</td>
-                  <td style="${textStyle}">${title}</td>
-                  <td style="padding: 8px 12px; text-align: right;">
-                    <span style="background: ${badgeBg}; color: ${badgeColor}; padding: 2.5px 8px; border-radius: 9999px; font-size: 10px; font-weight: bold; text-transform: uppercase; border: 1px solid ${isUnchecked ? '#fca5a5' : '#a7f3d0'};">
-                      ${labelStatus}
-                    </span>
-                  </td>
-                </tr>
-              `;
-            }).join("")}
-          </tbody>
-        </table>
+            const categoryMatch = cleanItem.match(/^(.+?)\s*\[([^\]]+)\](?:\s*-\s*(.*))?$/);
+            if (categoryMatch) {
+              itemTitle = categoryMatch[1].trim();
+              itemCategory = categoryMatch[2].trim();
+              itemDetail = categoryMatch[3] ? categoryMatch[3].trim() : "";
+            } else {
+              const descIndex = cleanItem.indexOf(" - ");
+              if (descIndex !== -1) {
+                itemTitle = cleanItem.substring(0, descIndex).trim();
+                itemDetail = cleanItem.substring(descIndex + 3).trim();
+              }
+            }
+
+            const cardBg = isUnchecked ? "#fafafa" : "#ffffff";
+            const leftBorder = isUnchecked ? "4px solid #ef4444" : "4px solid #4338ca";
+            const badgeBg = isUnchecked ? "#fee2e2" : "#ecfdf5";
+            const badgeColor = isUnchecked ? "#ef4444" : "#059669";
+            const badgeText = isUnchecked ? `Ditangguhkan (${itemCategory})` : itemCategory;
+            const textDecoration = isUnchecked ? "text-decoration: line-through; color: #94a3b8;" : "";
+
+            return `
+              <div style="background: ${cardBg}; border: 1px solid #e2e8f0; border-left: ${leftBorder}; border-radius: 8px; padding: 12px 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); display: block;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 15px;">
+                  <span style="font-size: 12px; font-weight: 800; color: #0f172a; ${textDecoration}">
+                    ${index + 1}. ${itemTitle}
+                  </span>
+                  <span style="background: ${badgeBg}; color: ${badgeColor}; padding: 2.5px 8px; border-radius: 9999px; font-size: 9px; font-weight: 800; text-transform: uppercase; border: 1px solid ${isUnchecked ? '#fca5a5' : '#a7f3d0'}; white-space: nowrap;">
+                    ${badgeText}
+                  </span>
+                </div>
+                ${itemDetail ? `
+                  <div style="font-size: 11px; line-height: 1.5; color: #475569; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #f1f5f9; margin-top: 4px; ${textDecoration}">
+                    ${itemDetail}
+                  </div>
+                ` : ""}
+              </div>
+            `;
+          }).join("")}
+        </div>
       </div>
     `;
   }
@@ -301,43 +314,56 @@ export function generateDocumentHTML(doc: DocumentHandover): string {
   if (doc.items && doc.items.length > 0) {
     itemsHtml = `
       <div style="margin-top: 20px; margin-bottom: 25px;">
-        <h4 style="margin: 0 0 10px 0; font-size: 13px; font-weight: 800; color: #4338ca; text-transform: uppercase; letter-spacing: 0.5px;">Daftar Barang / Berkas Serah Terima:</h4>
-        <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
-          <thead>
-            <tr style="background: #f1f5f9; border-bottom: 2px solid #cbd5e1;">
-              <th style="padding: 8px 12px; font-weight: bold; color: #334155; width: 40px;">No</th>
-              <th style="padding: 8px 12px; font-weight: bold; color: #334155;">Deskripsi Item</th>
-              <th style="padding: 8px 12px; font-weight: bold; color: #334155; width: 100px; text-align: right;">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${doc.items.map((item, index) => {
-              const isUnchecked = item.includes(" - Ditangguhkan");
-              const cleanItem = isUnchecked ? item.replace(" - Ditangguhkan", "") : item;
-              const parts = cleanItem.split(" [");
-              const title = parts[0] || cleanItem;
-              const categoryDesc = parts[1] ? parts[1].replace("]", "") : "Umum";
-              
-              const badgeBg = isUnchecked ? "#fee2e2" : "#ecfdf5";
-              const badgeColor = isUnchecked ? "#991b1b" : "#065f46";
-              const labelStatus = isUnchecked ? `Ditangguhkan (${categoryDesc})` : categoryDesc;
-              const rowStyle = isUnchecked ? "border-bottom: 1px solid #e2e8f0; background-color: #fafafa; opacity: 0.75;" : "border-bottom: 1px solid #e2e8f0;";
-              const textStyle = isUnchecked ? "padding: 8px 12px; font-weight: 600; color: #64748b; text-decoration: line-through;" : "padding: 8px 12px; font-weight: 600; color: #0f172a;";
+        <h4 style="margin: 0 0 12px 0; font-size: 13px; font-weight: 800; color: #4338ca; text-transform: uppercase; letter-spacing: 0.5px;">Rincian Serah Terima Per Kegiatan:</h4>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          ${doc.items.map((item, index) => {
+            const isUnchecked = item.includes(" - Ditangguhkan");
+            const cleanItem = isUnchecked ? item.replace(" - Ditangguhkan", "") : item;
+            
+            // Parse item title, category, and detail
+            let itemTitle = cleanItem;
+            let itemCategory = "Umum";
+            let itemDetail = "";
 
-              return `
-                <tr style="${rowStyle}">
-                  <td style="padding: 8px 12px; color: #94a3b8;">${index + 1}</td>
-                  <td style="${textStyle}">${title}</td>
-                  <td style="padding: 8px 12px; text-align: right;">
-                    <span style="background: ${badgeBg}; color: ${badgeColor}; padding: 2.5px 8px; border-radius: 9999px; font-size: 10px; font-weight: bold; text-transform: uppercase; border: 1px solid ${isUnchecked ? '#fca5a5' : '#a7f3d0'};">
-                      ${labelStatus}
-                    </span>
-                  </td>
-                </tr>
-              `;
-            }).join("")}
-          </tbody>
-        </table>
+            const categoryMatch = cleanItem.match(/^(.+?)\s*\[([^\]]+)\](?:\s*-\s*(.*))?$/);
+            if (categoryMatch) {
+              itemTitle = categoryMatch[1].trim();
+              itemCategory = categoryMatch[2].trim();
+              itemDetail = categoryMatch[3] ? categoryMatch[3].trim() : "";
+            } else {
+              const descIndex = cleanItem.indexOf(" - ");
+              if (descIndex !== -1) {
+                itemTitle = cleanItem.substring(0, descIndex).trim();
+                itemDetail = cleanItem.substring(descIndex + 3).trim();
+              }
+            }
+
+            const cardBg = isUnchecked ? "#fafafa" : "#ffffff";
+            const leftBorder = isUnchecked ? "4px solid #ef4444" : "4px solid #4338ca";
+            const badgeBg = isUnchecked ? "#fee2e2" : "#ecfdf5";
+            const badgeColor = isUnchecked ? "#ef4444" : "#059669";
+            const badgeText = isUnchecked ? `Ditangguhkan (${itemCategory})` : itemCategory;
+            const textDecoration = isUnchecked ? "text-decoration: line-through; color: #94a3b8;" : "";
+
+            return `
+              <div style="background: ${cardBg}; border: 1px solid #e2e8f0; border-left: ${leftBorder}; border-radius: 8px; padding: 12px 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); display: block;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 15px;">
+                  <span style="font-size: 12px; font-weight: 800; color: #0f172a; ${textDecoration}">
+                    ${index + 1}. ${itemTitle}
+                  </span>
+                  <span style="background: ${badgeBg}; color: ${badgeColor}; padding: 2.5px 8px; border-radius: 9999px; font-size: 9px; font-weight: 800; text-transform: uppercase; border: 1px solid ${isUnchecked ? '#fca5a5' : '#a7f3d0'}; white-space: nowrap;">
+                    ${badgeText}
+                  </span>
+                </div>
+                ${itemDetail ? `
+                  <div style="font-size: 11px; line-height: 1.5; color: #475569; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #f1f5f9; margin-top: 4px; ${textDecoration}">
+                    ${itemDetail}
+                  </div>
+                ` : ""}
+              </div>
+            `;
+          }).join("")}
+        </div>
       </div>
     `;
   }
