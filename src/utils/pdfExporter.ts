@@ -49,14 +49,27 @@ export async function exportDocumentToPDF(doc: DocumentHandover): Promise<void> 
           </thead>
           <tbody>
             ${doc.items.map((item, index) => {
-              const parts = item.split(" [");
-              const title = parts[0] || item;
-              const status = parts[1] ? parts[1].replace("]", "") : "Baik";
+              const isUnchecked = item.includes(" - Ditangguhkan");
+              const cleanItem = isUnchecked ? item.replace(" - Ditangguhkan", "") : item;
+              const parts = cleanItem.split(" [");
+              const title = parts[0] || cleanItem;
+              const categoryDesc = parts[1] ? parts[1].replace("]", "") : "Umum";
+              
+              const badgeBg = isUnchecked ? "#fee2e2" : "#ecfdf5";
+              const badgeColor = isUnchecked ? "#991b1b" : "#065f46";
+              const labelStatus = isUnchecked ? `Ditangguhkan (${categoryDesc})` : categoryDesc;
+              const rowStyle = isUnchecked ? "border-bottom: 1px solid #e2e8f0; background-color: #fafafa; opacity: 0.75;" : "border-bottom: 1px solid #e2e8f0;";
+              const textStyle = isUnchecked ? "padding: 8px 12px; font-weight: 600; color: #64748b; text-decoration: line-through;" : "padding: 8px 12px; font-weight: 600; color: #0f172a;";
+
               return `
-                <tr style="border-bottom: 1px solid #e2e8f0;">
-                  <td style="padding: 8px 12px; color: #64748b;">${index + 1}</td>
-                  <td style="padding: 8px 12px; font-weight: 600; color: #0f172a;">${title}</td>
-                  <td style="padding: 8px 12px; text-align: right;"><span style="background: #ecfdf5; color: #065f46; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: bold;">${status}</span></td>
+                <tr style="${rowStyle}">
+                  <td style="padding: 8px 12px; color: #94a3b8;">${index + 1}</td>
+                  <td style="${textStyle}">${title}</td>
+                  <td style="padding: 8px 12px; text-align: right;">
+                    <span style="background: ${badgeBg}; color: ${badgeColor}; padding: 2.5px 8px; border-radius: 9999px; font-size: 10px; font-weight: bold; text-transform: uppercase; border: 1px solid ${isUnchecked ? '#fca5a5' : '#a7f3d0'};">
+                      ${labelStatus}
+                    </span>
+                  </td>
                 </tr>
               `;
             }).join("")}
@@ -299,14 +312,27 @@ export function generateDocumentHTML(doc: DocumentHandover): string {
           </thead>
           <tbody>
             ${doc.items.map((item, index) => {
-              const parts = item.split(" [");
-              const title = parts[0] || item;
-              const status = parts[1] ? parts[1].replace("]", "") : "Baik";
+              const isUnchecked = item.includes(" - Ditangguhkan");
+              const cleanItem = isUnchecked ? item.replace(" - Ditangguhkan", "") : item;
+              const parts = cleanItem.split(" [");
+              const title = parts[0] || cleanItem;
+              const categoryDesc = parts[1] ? parts[1].replace("]", "") : "Umum";
+              
+              const badgeBg = isUnchecked ? "#fee2e2" : "#ecfdf5";
+              const badgeColor = isUnchecked ? "#991b1b" : "#065f46";
+              const labelStatus = isUnchecked ? `Ditangguhkan (${categoryDesc})` : categoryDesc;
+              const rowStyle = isUnchecked ? "border-bottom: 1px solid #e2e8f0; background-color: #fafafa; opacity: 0.75;" : "border-bottom: 1px solid #e2e8f0;";
+              const textStyle = isUnchecked ? "padding: 8px 12px; font-weight: 600; color: #64748b; text-decoration: line-through;" : "padding: 8px 12px; font-weight: 600; color: #0f172a;";
+
               return `
-                <tr style="border-bottom: 1px solid #e2e8f0;">
-                  <td style="padding: 8px 12px; color: #64748b;">${index + 1}</td>
-                  <td style="padding: 8px 12px; font-weight: 600; color: #0f172a;">${title}</td>
-                  <td style="padding: 8px 12px; text-align: right;"><span style="background: #ecfdf5; color: #065f46; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: bold;">${status}</span></td>
+                <tr style="${rowStyle}">
+                  <td style="padding: 8px 12px; color: #94a3b8;">${index + 1}</td>
+                  <td style="${textStyle}">${title}</td>
+                  <td style="padding: 8px 12px; text-align: right;">
+                    <span style="background: ${badgeBg}; color: ${badgeColor}; padding: 2.5px 8px; border-radius: 9999px; font-size: 10px; font-weight: bold; text-transform: uppercase; border: 1px solid ${isUnchecked ? '#fca5a5' : '#a7f3d0'};">
+                      ${labelStatus}
+                    </span>
+                  </td>
                 </tr>
               `;
             }).join("")}

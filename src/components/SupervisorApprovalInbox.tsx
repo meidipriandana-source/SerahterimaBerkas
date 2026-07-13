@@ -404,11 +404,20 @@ export default function SupervisorApprovalInbox({
                 <div className="sm:col-span-2 border-t border-slate-200/60 pt-2.5">
                   <span className="text-indigo-600 block font-black text-[9px] uppercase tracking-wide mb-1.5">Rincian Berkas yang Diserahkan ({selectedDoc.items.length})</span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {selectedDoc.items.map((item, idx) => (
-                      <div key={idx} className="bg-white border border-slate-200/80 rounded-md px-2.5 py-1.5 text-xs text-slate-700 font-semibold shadow-3xs">
-                        {idx + 1}. {item}
-                      </div>
-                    ))}
+                    {selectedDoc.items.map((item, idx) => {
+                      const isUnchecked = item.includes(" - Ditangguhkan");
+                      const cleanItemName = isUnchecked ? item.replace(" - Ditangguhkan", "") : item;
+                      return (
+                        <div key={idx} className={`border rounded-md px-2.5 py-1.5 text-xs font-semibold shadow-3xs flex justify-between items-center transition-all ${isUnchecked ? 'bg-slate-50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 line-through decoration-slate-300 dark:decoration-slate-700 italic opacity-75' : 'bg-white dark:bg-slate-800/80 border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-200'}`}>
+                          <span>{idx + 1}. {cleanItemName}</span>
+                          {isUnchecked && (
+                            <span className="text-[8px] font-black bg-red-100/70 dark:bg-red-950/40 text-red-700 dark:text-red-400 border border-red-200/50 dark:border-red-900/30 px-1.5 py-0.5 rounded uppercase tracking-wider scale-95 origin-right shrink-0">
+                              Ditangguhkan
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}

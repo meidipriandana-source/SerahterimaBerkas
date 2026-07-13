@@ -137,6 +137,34 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
   useEffect(() => {
     localStorage.setItem("handover_form_checkedItems", JSON.stringify(checkedItems));
   }, [checkedItems]);
+
+  useEffect(() => {
+    let changed = false;
+    const newChecked = { ...checkedItems };
+    items.forEach(item => {
+      if (newChecked[item] === undefined) {
+        const now = new Date();
+        const freezeDate = now.toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "short",
+          year: "numeric"
+        });
+        const freezeTime = now.toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        });
+        newChecked[item] = {
+          returned: true,
+          timestamp: `${freezeDate}, ${freezeTime} WIB`
+        };
+        changed = true;
+      }
+    });
+    if (changed) {
+      setCheckedItems(newChecked);
+    }
+  }, [items]);
   
   // Inline editing state for document items
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
@@ -234,14 +262,25 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    let finalItems = [...items];
     let mainTitle = title.trim();
     let mainDesc = description.trim();
 
-    // Auto-add the currently filled fields as an item if no items have been added yet
-    if (finalItems.length === 0 && mainTitle) {
-      const itemLabel = `${mainTitle} [${category}]${mainDesc ? ' - ' + mainDesc : ''}`;
-      finalItems.push(itemLabel);
+    let finalItems: string[] = [];
+    if (items.length === 0) {
+      if (mainTitle) {
+        const itemLabel = `${mainTitle} [${category}]${mainDesc ? ' - ' + mainDesc : ''}`;
+        finalItems.push(itemLabel);
+      }
+    } else {
+      const hasAnyChecked = items.some(item => checkedItems[item]?.returned);
+      if (!hasAnyChecked) {
+        alert("Harap contreng/pilih minimal 1 berkas dalam daftar untuk dikirim!");
+        return;
+      }
+      finalItems = items.map(item => {
+        const isChecked = checkedItems[item]?.returned;
+        return isChecked ? item : `${item} - Ditangguhkan`;
+      });
     }
 
     if (finalItems.length === 0) {
@@ -693,10 +732,10 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
 
                     return (
                       <div key={idx} className="flex gap-3 text-xs relative z-10">
-                        <div className={`w-7 h-7 rounded-full border-2 border-white text-white flex items-center justify-center font-extrabold shrink-0 text-[10px] shadow-xs transition-colors duration-350 ${isChecked ? 'bg-emerald-600' : 'bg-indigo-600'}`}>
+                        <div className={`w-7 h-7 rounded-full border-2 border-white text-white flex items-center justify-center font-extrabold shrink-0 text-[10px] shadow-xs transition-colors duration-350 ${isChecked ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-slate-400 dark:bg-slate-600'}`}>
                           {idx + 1}
                         </div>
-                        <div className={`flex-1 min-w-0 p-4 rounded-xl border transition-all duration-300 ${isChecked ? 'bg-emerald-50/40 border-emerald-200 shadow-3xs' : 'bg-white border-slate-200/60 shadow-3xs hover:border-indigo-200'}`}>
+                        <div className={`flex-1 min-w-0 p-4 rounded-xl border transition-all duration-300 ${isChecked ? 'bg-emerald-50/40 dark:bg-emerald-950/15 border-emerald-200 dark:border-emerald-800 shadow-3xs' : 'bg-slate-50/70 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 shadow-3xs opacity-60'}`}>
                           
                           {/* Top row: Checkbox, parsed title and badges/actions */}
                           <div className="flex flex-col gap-3">
@@ -779,11 +818,11 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                                   />
                                 ) : (
                                   <div className="space-y-1 min-w-0 flex-1">
-                                    <span className={`font-black text-xs leading-normal transition-all duration-350 block break-words text-slate-850 group-hover:text-indigo-900 ${isChecked ? 'text-emerald-800 line-through decoration-emerald-500 decoration-2' : ''}`}>
+                                    <span className={`font-black text-xs leading-normal transition-all duration-350 block break-words text-slate-850 dark:text-slate-100 group-hover:text-indigo-900 dark:group-hover:text-indigo-300 ${isChecked ? '' : 'text-slate-450 dark:text-slate-500 line-through decoration-slate-400 dark:decoration-slate-600 decoration-1 italic'}`}>
                                       {parsed.title}
                                     </span>
                                     {parsed.category && (
-                                      <span className="inline-block text-[8px] font-black bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded uppercase tracking-wider border border-indigo-100/50">
+                                      <span className="inline-block text-[8px] font-black bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 px-1.5 py-0.5 rounded uppercase tracking-wider border border-indigo-100/50 dark:border-indigo-900/30">
                                         Kategori: {parsed.category}
                                       </span>
                                     )}
@@ -792,7 +831,7 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                               </label>
 
                               {/* Action Buttons & Badges */}
-                              <div className="flex items-center gap-1 shrink-0 bg-slate-50 p-1 rounded-lg border border-slate-100">
+                              <div className="flex items-center gap-1 shrink-0 bg-slate-50 dark:bg-slate-850 p-1 rounded-lg border border-slate-100 dark:border-slate-800">
                                 <button
                                   type="button"
                                   onClick={(e) => {
@@ -801,7 +840,7 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                                     setEditingIdx(idx);
                                     setEditValue(item);
                                   }}
-                                  className="p-1 hover:bg-white hover:text-indigo-600 hover:shadow-3xs rounded text-slate-400 transition cursor-pointer"
+                                  className="p-1 hover:bg-white dark:hover:bg-slate-850 hover:text-indigo-600 hover:shadow-3xs rounded text-slate-400 dark:text-slate-500 transition cursor-pointer"
                                   title="Edit nama berkas"
                                 >
                                   <Pencil className="w-3 h-3" />
@@ -814,7 +853,7 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                                     const updated = items.filter((_, i) => i !== idx);
                                     setItems(updated);
                                   }}
-                                  className="p-1 hover:bg-white hover:text-red-500 hover:shadow-3xs rounded text-slate-400 transition cursor-pointer"
+                                  className="p-1 hover:bg-white dark:hover:bg-slate-850 hover:text-red-500 hover:shadow-3xs rounded text-slate-400 dark:text-slate-500 transition cursor-pointer"
                                   title="Hapus berkas"
                                 >
                                   <Trash2 className="w-3 h-3" />
@@ -824,40 +863,40 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
 
                             {/* Separated Description/Details block - tidy, slim, spacious */}
                             {parsed.description && (
-                              <div className="bg-slate-50/70 border border-slate-150 rounded-lg p-2.5 text-[11px] text-slate-600 leading-relaxed font-medium break-words">
-                                <span className="font-extrabold text-[8px] text-slate-400 block uppercase tracking-wider mb-1">Rincian Berkas:</span>
+                              <div className="bg-slate-50/70 dark:bg-slate-950/20 border border-slate-150 dark:border-slate-800 rounded-lg p-2.5 text-[11px] text-slate-600 dark:text-slate-350 leading-relaxed font-medium break-words">
+                                <span className="font-extrabold text-[8px] text-slate-400 dark:text-slate-500 block uppercase tracking-wider mb-1">Rincian Berkas:</span>
                                 {parsed.description}
                               </div>
                             )}
 
                             {/* Pihak Terkait row */}
-                            <div className="text-[10px] text-slate-500 space-y-1 bg-slate-50/40 p-2.5 rounded-lg border border-slate-100">
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400 space-y-1 bg-slate-50/40 dark:bg-slate-950/10 p-2.5 rounded-lg border border-slate-100 dark:border-slate-800">
                               <div className="flex items-center gap-2">
-                                <span className="text-[8px] font-black text-indigo-600 bg-indigo-50 border border-indigo-100 px-1.5 py-0.2 rounded uppercase">Pihak I</span>
-                                <span className="font-extrabold text-slate-700">{senderName}</span>
+                                <span className="text-[8px] font-black text-indigo-600 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/30 px-1.5 py-0.2 rounded uppercase">Pihak I</span>
+                                <span className="font-extrabold text-slate-700 dark:text-slate-300">{senderName}</span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <span className="text-[8px] font-black text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.2 rounded uppercase">Pihak II</span>
-                                <span className="font-extrabold text-slate-700">{recipientPersonName} <span className="text-slate-400 font-medium">({recipientName})</span></span>
+                                <span className="text-[8px] font-black text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900/30 px-1.5 py-0.2 rounded uppercase">Pihak II</span>
+                                <span className="font-extrabold text-slate-700 dark:text-slate-300">{recipientPersonName} <span className="text-slate-400 dark:text-slate-500 font-medium">({recipientName})</span></span>
                               </div>
                             </div>
 
                             {/* Live Clock / Frozen Timestamp Badge */}
-                            <div className="flex items-center justify-between gap-2 border-t border-dashed border-slate-100 pt-2.5">
-                              <div className={`flex items-center gap-1 text-[8px] font-bold border px-2 py-0.8 rounded shadow-4xs transition-all duration-350 ${isChecked ? 'bg-emerald-100 border-emerald-200 text-emerald-800' : 'bg-slate-50 border-slate-200 text-slate-500'}`}>
-                                <CheckCircle2 className={`w-3 h-3 shrink-0 ${isChecked ? 'text-emerald-600' : 'text-slate-400'}`} />
-                                <span className="whitespace-nowrap">{isChecked ? 'Kembali & Tersimpan ✔' : 'Belum Kembali'}</span>
+                            <div className="flex items-center justify-between gap-2 border-t border-dashed border-slate-100 dark:border-slate-800 pt-2.5">
+                              <div className={`flex items-center gap-1 text-[8px] font-bold border px-2 py-0.8 rounded shadow-4xs transition-all duration-350 ${isChecked ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500'}`}>
+                                <CheckCircle2 className={`w-3 h-3 shrink-0 ${isChecked ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`} />
+                                <span className="whitespace-nowrap">{isChecked ? 'Siap Kirim (Tercontreng) ✔' : 'Ditangguhkan (Tidak Kirim)'}</span>
                               </div>
 
                               {isChecked ? (
-                                <div className="text-[9px] text-emerald-700 font-bold flex items-center gap-1">
-                                  <span className="font-mono bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-200/50">
+                                <div className="text-[9px] text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1">
+                                  <span className="font-mono bg-emerald-100 dark:bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-200/50 dark:border-emerald-800/30">
                                     {itemState.timestamp}
                                   </span>
                                 </div>
                               ) : (
-                                <div className="text-[9px] text-indigo-600 font-bold flex items-center gap-1">
-                                  <span className="font-mono bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100/30">
+                                <div className="text-[9px] text-indigo-600 dark:text-indigo-400 font-bold flex items-center gap-1">
+                                  <span className="font-mono bg-indigo-50 dark:bg-indigo-950 px-1.5 py-0.5 rounded border border-indigo-100/30 dark:border-indigo-900/30">
                                     {currentRealTimeStr}
                                   </span>
                                 </div>
@@ -896,10 +935,10 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                         const currentRealTimeStr = `${formattedDate}, ${formattedTime} WIB`;
 
                         return (
-                          <tr key={idx} className={`hover:bg-slate-50/50 transition-colors ${isChecked ? 'bg-emerald-50/20' : ''}`}>
+                          <tr key={idx} className={`hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors ${isChecked ? 'bg-emerald-50/10 dark:bg-emerald-950/5' : 'opacity-60 bg-slate-50/40 dark:bg-slate-900/20'}`}>
                             {/* No */}
-                            <td className="py-3 px-3.5 font-bold text-slate-600 text-center">
-                              <div className={`w-6 h-6 rounded-full flex items-center justify-center font-extrabold text-[10px] mx-auto text-white ${isChecked ? 'bg-emerald-600' : 'bg-indigo-600'}`}>
+                            <td className="py-3 px-3.5 font-bold text-slate-600 dark:text-slate-450 text-center">
+                              <div className={`w-6 h-6 rounded-full flex items-center justify-center font-extrabold text-[10px] mx-auto text-white ${isChecked ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-slate-400 dark:bg-slate-600'}`}>
                                 {idx + 1}
                               </div>
                             </td>
@@ -928,7 +967,7 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                                         }));
                                       }
                                     }}
-                                    className="mt-0.5 w-4 h-4 rounded text-emerald-600 border-slate-300 focus:ring-emerald-500 cursor-pointer"
+                                    className="mt-0.5 w-4 h-4 rounded text-emerald-600 border-slate-300 dark:border-slate-700 focus:ring-emerald-500 cursor-pointer"
                                   />
                                   {editingIdx === idx ? (
                                     <input
@@ -953,17 +992,17 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                                           setEditingIdx(null);
                                         }
                                       }}
-                                      className="px-1.5 py-0.5 text-xs border border-indigo-300 rounded bg-white font-bold w-full"
+                                      className="px-1.5 py-0.5 text-xs border border-indigo-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold w-full"
                                       autoFocus
                                     />
                                   ) : (
-                                    <span className={`font-black text-xs text-slate-800 leading-normal break-words ${isChecked ? 'line-through text-emerald-800' : ''}`}>
+                                    <span className={`font-black text-xs text-slate-800 dark:text-slate-200 leading-normal break-words ${isChecked ? '' : 'text-slate-450 dark:text-slate-500 line-through decoration-slate-400 dark:decoration-slate-600 decoration-1 italic font-medium'}`}>
                                       {parsed.title}
                                     </span>
                                   )}
                                 </div>
                                 {parsed.description && (
-                                  <p className="text-[10px] text-slate-500 font-medium pl-6.5 leading-relaxed break-words">
+                                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium pl-6.5 leading-relaxed break-words">
                                     {parsed.description}
                                   </p>
                                 )}
@@ -972,25 +1011,25 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
 
                             {/* Category */}
                             <td className="py-3 px-3.5">
-                              <span className="text-[8px] font-black px-2 py-0.5 rounded-full uppercase bg-indigo-50 text-indigo-700 border border-indigo-100/50 whitespace-nowrap">
+                              <span className="text-[8px] font-black px-2 py-0.5 rounded-full uppercase bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-100/50 dark:border-indigo-900/30 whitespace-nowrap">
                                 {parsed.category || "General"}
                               </span>
                             </td>
 
                             {/* Pihak Terkait */}
-                            <td className="py-3 px-3.5 text-[10px] text-slate-600 font-semibold space-y-1 whitespace-nowrap">
-                              <div><span className="text-slate-400 font-bold">Pihak I:</span> {senderName}</div>
-                              <div><span className="text-slate-400 font-bold">Pihak II:</span> {recipientPersonName}</div>
+                            <td className="py-3 px-3.5 text-[10px] text-slate-600 dark:text-slate-300 font-semibold space-y-1 whitespace-nowrap">
+                              <div><span className="text-slate-400 dark:text-slate-500 font-bold">Pihak I:</span> {senderName}</div>
+                              <div><span className="text-slate-400 dark:text-slate-500 font-bold">Pihak II:</span> {recipientPersonName}</div>
                             </td>
 
                             {/* Status & Time */}
                             <td className="py-3 px-3.5 font-bold">
                               <div className="space-y-1.5">
-                                <div className={`flex items-center gap-1 text-[8px] border px-1.5 py-0.5 rounded shadow-4xs w-fit ${isChecked ? 'bg-emerald-100 border-emerald-200 text-emerald-800' : 'bg-slate-50 border-slate-200 text-slate-500'}`}>
+                                <div className={`flex items-center gap-1 text-[8px] border px-1.5 py-0.5 rounded shadow-4xs w-fit ${isChecked ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500'}`}>
                                   <CheckCircle2 className="w-2.5 h-2.5" />
-                                  <span>{isChecked ? 'Kembali ✔' : 'Belum Kembali'}</span>
+                                  <span>{isChecked ? 'Siap Kirim ✔' : 'Tidak Kirim'}</span>
                                 </div>
-                                <div className="text-[9px] font-mono text-slate-500">
+                                <div className="text-[9px] font-mono text-slate-500 dark:text-slate-450">
                                   {isChecked ? itemState.timestamp : currentRealTimeStr}
                                 </div>
                               </div>
@@ -998,14 +1037,14 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
 
                             {/* Actions */}
                             <td className="py-3 px-3.5 text-center">
-                              <div className="flex items-center justify-center gap-1 bg-slate-50 p-1 rounded-lg border border-slate-100 w-fit mx-auto">
+                              <div className="flex items-center justify-center gap-1 bg-slate-50 dark:bg-slate-850 p-1 rounded-lg border border-slate-100 dark:border-slate-800 w-fit mx-auto">
                                 <button
                                   type="button"
                                   onClick={() => {
                                     setEditingIdx(idx);
                                     setEditValue(item);
                                   }}
-                                  className="p-1 hover:bg-white hover:text-indigo-600 hover:shadow-3xs rounded text-slate-400 transition"
+                                  className="p-1 hover:bg-white dark:hover:bg-slate-750 hover:text-indigo-600 hover:shadow-3xs rounded text-slate-400 dark:text-slate-500 transition cursor-pointer"
                                   title="Edit nama berkas"
                                 >
                                   <Pencil className="w-3.5 h-3.5" />
@@ -1016,7 +1055,7 @@ export default function HandoverForm({ onSuccessSubmit, triggerPushNotification,
                                     const updated = items.filter((_, i) => i !== idx);
                                     setItems(updated);
                                   }}
-                                  className="p-1 hover:bg-white hover:text-red-500 hover:shadow-3xs rounded text-slate-400 transition"
+                                  className="p-1 hover:bg-white dark:hover:bg-slate-750 hover:text-red-500 hover:shadow-3xs rounded text-slate-400 dark:text-slate-500 transition cursor-pointer"
                                   title="Hapus berkas"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
